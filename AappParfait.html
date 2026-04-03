@@ -1,0 +1,4352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StockMvt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fond: #f8f9fa;
+            --fond-secondaire: #ffffff;
+            --fond-tertiaire: #e9ecef;
+            --texte: #1a1a2e;
+            --texte-secondaire: #6c757d;
+            --texte-tertiaire: #adb5bd;
+            --bordure: #dee2e6;
+            --accent: #2d3436;
+            --accent-clair: #636e72;
+            --succes: #00b894;
+            --attention: #fdcb6e;
+            --danger: #e17055;
+            --info: #0984e3;
+            --ombre: 0 2px 8px rgba(0,0,0,0.08);
+            --ombre-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --rayon: 12px;
+            --rayon-sm: 8px;
+        }
+
+        [data-mode="sombre"] {
+            --fond: #0d1117;
+            --fond-secondaire: #161b22;
+            --fond-tertiaire: #21262d;
+            --texte: #e6edf3;
+            --texte-secondaire: #8b949e;
+            --texte-tertiaire: #484f58;
+            --bordure: #30363d;
+            --accent: #58a6ff;
+            --accent-clair: #8b949e;
+            --ombre: 0 2px 8px rgba(0,0,0,0.3);
+            --ombre-lg: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--fond);
+            color: var(--texte);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .ecran {
+            display: none;
+            min-height: 100vh;
+            animation: fonduIn 0.4s ease-out;
+        }
+
+        .ecran.actif {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fonduIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glissementHaut {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glissementDroite {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Langue */
+        .ecran-langue {
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            background: linear-gradient(180deg, var(--fond) 0%, var(--fond-secondaire) 100%);
+        }
+
+        .logo-conteneur {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 48px;
+            animation: glissementHaut 0.6s ease-out;
+        }
+
+        .logo-icone {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            box-shadow: var(--ombre-lg);
+        }
+
+        .logo-icone svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--fond-secondaire);
+        }
+
+        .logo-titre {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .langue-liste {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .langue-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon);
+            cursor: pointer;
+            transition: all 0.2s;
+            animation: glissementDroite 0.5s ease-out backwards;
+        }
+
+        .langue-btn:nth-child(1) { animation-delay: 0.1s; }
+        .langue-btn:nth-child(2) { animation-delay: 0.15s; }
+        .langue-btn:nth-child(3) { animation-delay: 0.2s; }
+        .langue-btn:nth-child(4) { animation-delay: 0.25s; }
+        .langue-btn:nth-child(5) { animation-delay: 0.3s; }
+
+        .langue-btn:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .langue-btn:active {
+            transform: scale(0.98);
+        }
+
+        .langue-emoji {
+            font-size: 28px;
+        }
+
+        .langue-nom {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Mode */
+        .ecran-mode {
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .mode-titre {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mode-soustitre {
+            color: var(--texte-secondaire);
+            margin-bottom: 32px;
+        }
+
+        .mode-liste {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mode-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border: 2px solid var(--bordure);
+            border-radius: var(--rayon);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .mode-btn.actif {
+            border-color: var(--accent);
+            background: var(--fond-tertiaire);
+        }
+
+        .mode-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--texte);
+        }
+
+        .mode-btn-texte {
+            flex: 1;
+            text-align: left;
+        }
+
+        .mode-btn-titre {
+            font-weight: 500;
+        }
+
+        .mode-btn-desc {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        /* Onboarding */
+        .ecran-onboarding {
+            padding: 24px;
+        }
+
+        .onboarding-conteneur {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .onboarding-slides {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .onboarding-slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            animation: fonduIn 0.4s;
+        }
+
+        .onboarding-slide.actif {
+            display: flex;
+        }
+
+        .onboarding-icone {
+            width: 120px;
+            height: 120px;
+            background: var(--fond-tertiaire);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .onboarding-icone svg {
+            width: 56px;
+            height: 56px;
+            stroke: var(--accent);
+        }
+
+        .onboarding-titre {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .onboarding-desc {
+            color: var(--texte-secondaire);
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .onboarding-indicateurs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .onboarding-indicateur {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bordure);
+            transition: all 0.3s;
+        }
+
+        .onboarding-indicateur.actif {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--accent);
+        }
+
+        .onboarding-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border: none;
+            border-radius: var(--rayon);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .onboarding-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Auth */
+        .ecran-auth {
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .auth-contenu {
+            text-align: center;
+            max-width: 320px;
+        }
+
+        .auth-icone {
+            width: 80px;
+            height: 80px;
+            background: var(--fond-tertiaire);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .auth-icone svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--accent);
+        }
+
+        .auth-titre {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .auth-desc {
+            color: var(--texte-secondaire);
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--fond-secondaire);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .google-btn:hover {
+            background: var(--fond-tertiaire);
+        }
+
+        .google-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Choix entreprise */
+        .ecran-choix-entreprise {
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .choix-contenu {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .choix-titre {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .choix-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            padding: 24px;
+            background: var(--fond-secondaire);
+            border: 2px solid var(--bordure);
+            border-radius: var(--rayon);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .choix-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .choix-btn svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--accent);
+        }
+
+        .choix-btn-titre {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .choix-btn-desc {
+            font-size: 13px;
+            color: var(--texte-secondaire);
+        }
+
+        /* Créer entreprise */
+        .ecran-creer-entreprise {
+            padding: 0;
+        }
+
+        .entete-formulaire {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .btn-retour {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: var(--rayon-sm);
+        }
+
+        .btn-retour:hover {
+            background: var(--fond-tertiaire);
+        }
+
+        .btn-retour svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--texte);
+        }
+
+        .entete-titre {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .formulaire-contenu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .formulaire-section {
+            margin-bottom: 24px;
+        }
+
+        .formulaire-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--texte-secondaire);
+        }
+
+        .formulaire-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--fond-secondaire);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon-sm);
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--texte);
+            transition: border-color 0.2s;
+        }
+
+        .formulaire-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .formulaire-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .logo-upload {
+            width: 100px;
+            height: 100px;
+            background: var(--fond-tertiaire);
+            border: 2px dashed var(--bordure);
+            border-radius: var(--rayon);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logo-upload:hover {
+            border-color: var(--accent);
+        }
+
+        .logo-upload svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .logo-upload-texte {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .theme-grille {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .theme-option {
+            aspect-ratio: 1;
+            border-radius: var(--rayon-sm);
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .theme-option:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-option.actif {
+            border-color: var(--texte);
+        }
+
+        .btn-valider {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border: none;
+            border-radius: var(--rayon);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.2s;
+        }
+
+        .btn-valider:hover {
+            opacity: 0.9;
+        }
+
+        /* Navigation principale */
+        .nav-principale {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--fond-secondaire);
+            border-top: 1px solid var(--bordure);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--texte-secondaire);
+            transition: all 0.2s;
+        }
+
+        .nav-item.actif {
+            color: var(--accent);
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Accueil */
+        .ecran-accueil {
+            padding-bottom: 80px;
+        }
+
+        .accueil-entete {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+        }
+
+        .accueil-entete-gauche {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .accueil-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .accueil-logo svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--fond-secondaire);
+        }
+
+        .accueil-nom-entreprise {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--fond-tertiaire);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .notification-btn svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--texte);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        .accueil-contenu {
+            padding: 20px;
+        }
+
+        .accueil-bienvenue {
+            margin-bottom: 24px;
+        }
+
+        .accueil-bienvenue-titre {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .accueil-bienvenue-texte {
+            color: var(--texte-secondaire);
+        }
+
+        .statistiques-grille {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-carte {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon);
+            padding: 16px;
+            box-shadow: var(--ombre);
+        }
+
+        .stat-carte.grande {
+            grid-column: span 2;
+        }
+
+        .stat-icone {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-icone svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .stat-icone.stocks { background: rgba(0, 184, 148, 0.15); }
+        .stat-icone.stocks svg { stroke: var(--succes); }
+        .stat-icone.faible { background: rgba(253, 203, 110, 0.15); }
+        .stat-icone.faible svg { stroke: var(--attention); }
+        .stat-icone.rupture { background: rgba(225, 112, 85, 0.15); }
+        .stat-icone.rupture svg { stroke: var(--danger); }
+        .stat-icone.valeur { background: rgba(9, 132, 227, 0.15); }
+        .stat-icone.valeur svg { stroke: var(--info); }
+
+        .stat-valeur {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--texte-secondaire);
+        }
+
+        .section-titre {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .mouvements-recents {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon);
+            overflow: hidden;
+            box-shadow: var(--ombre);
+        }
+
+        .mouvement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .mouvement-item:last-child {
+            border-bottom: none;
+        }
+
+        .mouvement-icone {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mouvement-icone.entree { background: rgba(0, 184, 148, 0.15); }
+        .mouvement-icone.entree svg { stroke: var(--succes); }
+        .mouvement-icone.sortie { background: rgba(225, 112, 85, 0.15); }
+        .mouvement-icone.sortie svg { stroke: var(--danger); }
+        .mouvement-icone.inventaire { background: rgba(9, 132, 227, 0.15); }
+        .mouvement-icone.inventaire svg { stroke: var(--info); }
+
+        .mouvement-icone svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .mouvement-infos {
+            flex: 1;
+        }
+
+        .mouvement-produit {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .mouvement-detail {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .mouvement-quantite {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .mouvement-quantite.positif { color: var(--succes); }
+        .mouvement-quantite.negatif { color: var(--danger); }
+
+        /* Produits */
+        .ecran-produits {
+            padding-bottom: 80px;
+        }
+
+        .produits-entete {
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .produits-recherche {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .recherche-input-conteneur {
+            flex: 1;
+            position: relative;
+        }
+
+        .recherche-input-conteneur svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .recherche-input {
+            width: 100%;
+            padding: 12px 12px 12px 42px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon-sm);
+            font-size: 14px;
+            color: var(--texte);
+        }
+
+        .recherche-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .scanner-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--fond-tertiaire);
+            border: none;
+            border-radius: var(--rayon-sm);
+            cursor: pointer;
+        }
+
+        .scanner-btn svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--texte);
+        }
+
+        .produits-onglets {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .produits-onglets::-webkit-scrollbar {
+            display: none;
+        }
+
+        .onglet-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--texte-secondaire);
+            transition: all 0.2s;
+        }
+
+        .onglet-btn.actif {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--fond-secondaire);
+        }
+
+        .onglet-nombre {
+            padding: 2px 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .produits-liste {
+            padding: 16px 20px;
+        }
+
+        .categorie-section {
+            margin-bottom: 16px;
+        }
+
+        .categorie-entete {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .categorie-gauche {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .categorie-nom {
+            font-weight: 500;
+        }
+
+        .categorie-nombre {
+            padding: 2px 8px;
+            background: var(--fond-tertiaire);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .categorie-toggle svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--texte-secondaire);
+            transition: transform 0.2s;
+        }
+
+        .categorie-section.ferme .categorie-toggle svg {
+            transform: rotate(-90deg);
+        }
+
+        .categorie-section.ferme .categorie-produits {
+            display: none;
+        }
+
+        .produit-carte {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            margin-bottom: 8px;
+            box-shadow: var(--ombre);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .produit-carte:hover {
+            transform: translateX(4px);
+        }
+
+        .produit-image {
+            width: 48px;
+            height: 48px;
+            background: var(--fond-tertiaire);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .produit-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .produit-image svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--texte-tertiaire);
+        }
+
+        .produit-infos {
+            flex: 1;
+        }
+
+        .produit-nom {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .produit-code {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .produit-droite {
+            text-align: right;
+        }
+
+        .produit-quantite {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .produit-statut {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .produit-statut.stock { background: rgba(0, 184, 148, 0.15); color: var(--succes); }
+        .produit-statut.faible { background: rgba(253, 203, 110, 0.15); color: #e67e22; }
+        .produit-statut.rupture { background: rgba(225, 112, 85, 0.15); color: var(--danger); }
+        .produit-statut.surstock { background: rgba(9, 132, 227, 0.15); color: var(--info); }
+
+        .btn-flottant {
+            position: fixed;
+            bottom: 88px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: var(--accent);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--ombre-lg);
+            z-index: 50;
+            transition: all 0.2s;
+        }
+
+        .btn-flottant:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-flottant svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--fond-secondaire);
+        }
+
+        /* Historique */
+        .ecran-historique {
+            padding-bottom: 80px;
+        }
+
+        .historique-entete {
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .historique-titre {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .historique-filtres {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filtre-btn {
+            padding: 8px 14px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--texte-secondaire);
+        }
+
+        .filtre-btn.actif {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--fond-secondaire);
+        }
+
+        .date-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .date-select svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .date-select span {
+            font-size: 13px;
+            color: var(--texte-secondaire);
+        }
+
+        .historique-liste {
+            padding: 16px 20px;
+        }
+
+        .historique-jour {
+            margin-bottom: 20px;
+        }
+
+        .historique-date {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--texte-secondaire);
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        .historique-item {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            padding: 14px;
+            margin-bottom: 8px;
+            box-shadow: var(--ombre);
+            cursor: pointer;
+        }
+
+        .historique-item-entete {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .historique-type-icone {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .historique-type-icone.entree { background: rgba(0, 184, 148, 0.15); }
+        .historique-type-icone.entree svg { stroke: var(--succes); }
+        .historique-type-icone.sortie { background: rgba(225, 112, 85, 0.15); }
+        .historique-type-icone.sortie svg { stroke: var(--danger); }
+        .historique-type-icone.inventaire { background: rgba(9, 132, 227, 0.15); }
+        .historique-type-icone.inventaire svg { stroke: var(--info); }
+
+        .historique-type-icone svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .historique-type {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .historique-heure {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .historique-produit {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .historique-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .historique-detail {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .historique-quantites {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--bordure);
+        }
+
+        .quantite-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .quantite-badge.avant { background: var(--fond-tertiaire); color: var(--texte-secondaire); }
+        .quantite-badge.apres { background: rgba(0, 184, 148, 0.15); color: var(--succes); }
+        .quantite-badge.final { background: var(--accent); color: var(--fond-secondaire); }
+
+        /* Notifications */
+        .ecran-notifications {
+            padding-bottom: 80px;
+        }
+
+        .notifications-entete {
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .notifications-titre {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .notifications-onglets {
+            display: flex;
+            gap: 8px;
+        }
+
+        .notif-onglet {
+            padding: 8px 16px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--texte-secondaire);
+        }
+
+        .notif-onglet.actif {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--fond-secondaire);
+        }
+
+        .notifications-liste {
+            padding: 16px 20px;
+        }
+
+        .notification-carte {
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            margin-bottom: 10px;
+            box-shadow: var(--ombre);
+            border-left: 4px solid transparent;
+        }
+
+        .notification-carte.non-lue {
+            border-left-color: var(--accent);
+        }
+
+        .notification-carte.faible { border-left-color: var(--attention); }
+        .notification-carte.rupture { border-left-color: var(--danger); }
+        .notification-carte.surstock { border-left-color: var(--info); }
+
+        .notification-icone {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icone.faible { background: rgba(253, 203, 110, 0.15); }
+        .notification-icone.faible svg { stroke: var(--attention); }
+        .notification-icone.rupture { background: rgba(225, 112, 85, 0.15); }
+        .notification-icone.rupture svg { stroke: var(--danger); }
+        .notification-icone.surstock { background: rgba(9, 132, 227, 0.15); }
+        .notification-icone.surstock svg { stroke: var(--info); }
+
+        .notification-icone svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-contenu {
+            flex: 1;
+        }
+
+        .notification-titre {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .notification-desc {
+            font-size: 13px;
+            color: var(--texte-secondaire);
+            margin-bottom: 6px;
+        }
+
+        .notification-date {
+            font-size: 11px;
+            color: var(--texte-tertiaire);
+        }
+
+        /* Rapports */
+        .ecran-rapports {
+            padding-bottom: 80px;
+        }
+
+        .rapports-entete {
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .rapports-titre {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .rapports-contenu {
+            padding: 20px;
+        }
+
+        .rapport-section {
+            margin-bottom: 28px;
+        }
+
+        .rapport-section-titre {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--bordure);
+        }
+
+        .rapport-carte {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            margin-bottom: 10px;
+            box-shadow: var(--ombre);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rapport-carte:hover {
+            transform: translateX(4px);
+        }
+
+        .rapport-icone {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rapport-icone svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .rapport-icone.stocks { background: rgba(0, 184, 148, 0.15); }
+        .rapport-icone.stocks svg { stroke: var(--succes); }
+        .rapport-icone.faible { background: rgba(253, 203, 110, 0.15); }
+        .rapport-icone.faible svg { stroke: var(--attention); }
+        .rapport-icone.rupture { background: rgba(225, 112, 85, 0.15); }
+        .rapport-icone.rupture svg { stroke: var(--danger); }
+        .rapport-icone.surstock { background: rgba(9, 132, 227, 0.15); }
+        .rapport-icone.surstock svg { stroke: var(--info); }
+        .rapport-icone.achat { background: rgba(108, 92, 231, 0.15); }
+        .rapport-icone.achat svg { stroke: #6c5ce7; }
+        .rapport-icone.vente { background: rgba(0, 184, 148, 0.15); }
+        .rapport-icone.vente svg { stroke: var(--succes); }
+        .rapport-icone.perte { background: rgba(225, 112, 85, 0.15); }
+        .rapport-icone.perte svg { stroke: var(--danger); }
+        .rapport-icone.finance { background: rgba(9, 132, 227, 0.15); }
+        .rapport-icone.finance svg { stroke: var(--info); }
+
+        .rapport-infos {
+            flex: 1;
+        }
+
+        .rapport-nom {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .rapport-nombre {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .rapport-fleche svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--texte-tertiaire);
+        }
+
+        /* Aperçu rapport */
+        .ecran-apercu-rapport {
+            padding: 0;
+        }
+
+        .rapport-entete-document {
+            padding: 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .rapport-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .rapport-entreprise-logo {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rapport-entreprise-logo svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--fond-secondaire);
+        }
+
+        .rapport-entreprise-nom {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .rapport-titre-document {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .rapport-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .rapport-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .rapport-tableau-conteneur {
+            flex: 1;
+            overflow-x: auto;
+            padding: 16px;
+        }
+
+        .rapport-tableau {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            overflow: hidden;
+            box-shadow: var(--ombre);
+        }
+
+        .rapport-tableau th,
+        .rapport-tableau td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .rapport-tableau th {
+            background: var(--fond-tertiaire);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--texte-secondaire);
+        }
+
+        .rapport-tableau tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rapport-tableau tr:hover td {
+            background: var(--fond);
+        }
+
+        .rapport-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--fond-secondaire);
+            border-top: 2px solid var(--accent);
+            margin-top: 16px;
+            border-radius: var(--rayon-sm);
+        }
+
+        .rapport-total-label {
+            font-weight: 600;
+        }
+
+        .rapport-total-valeur {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Menu */
+        .ecran-menu {
+            padding-bottom: 80px;
+        }
+
+        .menu-entete {
+            padding: 24px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .menu-profil {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .menu-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--fond-tertiaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .menu-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .menu-avatar svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .menu-profil-nom {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .menu-profil-email {
+            font-size: 13px;
+            color: var(--texte-secondaire);
+        }
+
+        .menu-contenu {
+            padding: 16px 20px;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-section-titre {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--texte-secondaire);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-item:hover {
+            background: var(--fond-tertiaire);
+        }
+
+        .menu-item svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .menu-item-texte {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .menu-item-droite {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-item-fleche svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--texte-tertiaire);
+        }
+
+        .menu-interrupteur {
+            width: 44px;
+            height: 24px;
+            background: var(--bordure);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .menu-interrupteur.actif {
+            background: var(--succes);
+        }
+
+        .menu-interrupteur::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: var(--fond-secondaire);
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .menu-interrupteur.actif::after {
+            transform: translateX(20px);
+        }
+
+        .menu-danger {
+            color: var(--danger);
+        }
+
+        .menu-danger svg {
+            stroke: var(--danger);
+        }
+
+        .menu-version {
+            text-align: center;
+            padding: 20px;
+            color: var(--texte-tertiaire);
+            font-size: 12px;
+        }
+
+        /* Entreprise */
+        .ecran-entreprise {
+            padding-bottom: 80px;
+        }
+
+        .entreprise-entete {
+            padding: 24px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+            text-align: center;
+        }
+
+        .entreprise-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .entreprise-logo svg {
+            width: 44px;
+            height: 44px;
+            stroke: var(--fond-secondaire);
+        }
+
+        .entreprise-nom {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .entreprise-description {
+            font-size: 14px;
+            color: var(--texte-secondaire);
+            margin-bottom: 8px;
+        }
+
+        .entreprise-devise {
+            font-size: 13px;
+            color: var(--texte-tertiaire);
+        }
+
+        .entreprise-contenu {
+            padding: 20px;
+        }
+
+        .entreprise-boutons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .entreprise-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: var(--fond-secondaire);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .entreprise-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .entreprise-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--accent);
+        }
+
+        .entreprise-btn span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .utilisateurs-section {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon);
+            padding: 16px;
+        }
+
+        .utilisateurs-titre {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .utilisateur-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .utilisateur-item:last-child {
+            border-bottom: none;
+        }
+
+        .utilisateur-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--fond-tertiaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .utilisateur-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .utilisateur-avatar svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .utilisateur-infos {
+            flex: 1;
+        }
+
+        .utilisateur-nom {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .utilisateur-role {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+        }
+
+        .badge-admin {
+            padding: 4px 8px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .quitter-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(225, 112, 85, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: var(--rayon);
+            color: var(--danger);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Détails produit */
+        .ecran-details-produit {
+            padding: 0;
+        }
+
+        .details-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 16px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .action-btn.entree { border-color: var(--succes); }
+        .action-btn.entree svg { stroke: var(--succes); }
+        .action-btn.sortie { border-color: var(--danger); }
+        .action-btn.sortie svg { stroke: var(--danger); }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--accent);
+        }
+
+        .action-btn span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .details-image {
+            width: 100%;
+            height: 200px;
+            background: var(--fond-tertiaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .details-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .details-image svg {
+            width: 64px;
+            height: 64px;
+            stroke: var(--texte-tertiaire);
+        }
+
+        .details-contenu {
+            padding: 20px;
+        }
+
+        .details-nom {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .details-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--texte-secondaire);
+            margin-bottom: 16px;
+        }
+
+        .details-section {
+            margin-bottom: 20px;
+        }
+
+        .details-section-titre {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--texte-secondaire);
+            margin-bottom: 10px;
+        }
+
+        .details-grille {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .details-item {
+            background: var(--fond-secondaire);
+            padding: 12px;
+            border-radius: var(--rayon-sm);
+        }
+
+        .details-item-label {
+            font-size: 11px;
+            color: var(--texte-secondaire);
+            margin-bottom: 4px;
+        }
+
+        .details-item-valeur {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .details-modifier-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--fond-secondaire);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        /* Ajout produit */
+        .ecran-ajout-produit {
+            padding: 0 0 80px;
+        }
+
+        .ajout-image-zone {
+            width: 100%;
+            height: 180px;
+            background: var(--fond-tertiaire);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .ajout-image-zone svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .ajout-image-zone span {
+            font-size: 14px;
+            color: var(--texte-secondaire);
+        }
+
+        .ajout-formulaire {
+            padding: 20px;
+        }
+
+        .ajout-champ {
+            margin-bottom: 16px;
+        }
+
+        .ajout-champ-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--texte-secondaire);
+        }
+
+        .ajout-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--fond-secondaire);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon-sm);
+            font-size: 14px;
+            color: var(--texte);
+        }
+
+        .ajout-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .ajout-input-avec-icones {
+            display: flex;
+            gap: 8px;
+        }
+
+        .ajout-input-avec-icones input {
+            flex: 1;
+        }
+
+        .ajout-icone-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--fond-tertiaire);
+            border: none;
+            border-radius: var(--rayon-sm);
+            cursor: pointer;
+        }
+
+        .ajout-icone-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--texte);
+        }
+
+        .ajout-ligne {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .ajout-prix-section {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon);
+            padding: 16px;
+            margin-top: 8px;
+        }
+
+        .ajout-prix-ligne {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .ajout-prix-ligne:last-child {
+            border-bottom: none;
+        }
+
+        .ajout-prix-label {
+            color: var(--texte-secondaire);
+        }
+
+        .ajout-prix-valeur {
+            font-weight: 600;
+        }
+
+        .ajout-prix-valeur.positif {
+            color: var(--succes);
+        }
+
+        .ajout-enregistrer-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border: none;
+            border-radius: var(--rayon);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: flex-end;
+            z-index: 200;
+        }
+
+        .modal-overlay.actif {
+            display: flex;
+        }
+
+        .modal-contenu {
+            width: 100%;
+            max-height: 90vh;
+            background: var(--fond-secondaire);
+            border-radius: 20px 20px 0 0;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-entete {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--bordure);
+            position: sticky;
+            top: 0;
+            background: var(--fond-secondaire);
+        }
+
+        .modal-titre {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-fermer {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--fond-tertiaire);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .modal-fermer svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--texte);
+        }
+
+        .modal-corps {
+            padding: 20px;
+        }
+
+        .mouvement-formulaire {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .mouvement-champ {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mouvement-champ label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--texte-secondaire);
+        }
+
+        .mouvement-select {
+            padding: 12px;
+            background: var(--fond);
+            border: 1px solid var(--bordure);
+            border-radius: var(--rayon-sm);
+            font-size: 14px;
+            color: var(--texte);
+        }
+
+        .mouvement-apercu {
+            background: var(--fond);
+            border-radius: var(--rayon);
+            padding: 16px;
+        }
+
+        .mouvement-apercu-titre {
+            font-size: 12px;
+            color: var(--texte-secondaire);
+            margin-bottom: 10px;
+        }
+
+        .mouvement-apercu-valeurs {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .apercu-valeur {
+            padding: 8px 16px;
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon-sm);
+            font-weight: 600;
+        }
+
+        .apercu-fleche {
+            color: var(--texte-tertiaire);
+        }
+
+        .mouvement-valider-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border: none;
+            border-radius: var(--rayon);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            body {
+                display: flex;
+                justify-content: center;
+                background: var(--fond-tertiaire);
+            }
+
+            .ecran {
+                max-width: 420px;
+                background: var(--fond);
+                box-shadow: var(--ombre-lg);
+            }
+
+            .nav-principale {
+                max-width: 420px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .btn-flottant {
+                right: calc(50% - 190px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Écran Langue -->
+    <div class="ecran ecran-langue actif" id="ecran-langue">
+        <div class="logo-conteneur">
+            <div class="logo-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18"/>
+                    <path d="M5 21V7l8-4v18"/>
+                    <path d="M19 21V11l-6-4"/>
+                    <path d="M9 9v.01"/>
+                    <path d="M9 12v.01"/>
+                    <path d="M9 15v.01"/>
+                    <path d="M9 18v.01"/>
+                </svg>
+            </div>
+            <h1 class="logo-titre">StockMvt</h1>
+        </div>
+        <div class="langue-liste">
+            <button class="langue-btn" data-langue="fr">
+                <span class="langue-emoji">🇫🇷</span>
+                <span class="langue-nom">Français</span>
+            </button>
+            <button class="langue-btn" data-langue="en">
+                <span class="langue-emoji">🇬🇧</span>
+                <span class="langue-nom">English</span>
+            </button>
+            <button class="langue-btn" data-langue="hi">
+                <span class="langue-emoji">🇮🇳</span>
+                <span class="langue-nom">हिन्दी</span>
+            </button>
+            <button class="langue-btn" data-langue="ln">
+                <span class="langue-emoji">🇨🇩</span>
+                <span class="langue-nom">Lingala</span>
+            </button>
+            <button class="langue-btn" data-langue="sw">
+                <span class="langue-emoji">🇨🇩</span>
+                <span class="langue-nom">Swahili</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Écran Mode -->
+    <div class="ecran ecran-mode" id="ecran-mode">
+        <h2 class="mode-titre">Choisir le mode</h2>
+        <p class="mode-soustitre">Sélectionnez votre préférence d'affichage</p>
+        <div class="mode-liste">
+            <button class="mode-btn actif" data-mode="systeme">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                <div class="mode-btn-texte">
+                    <div class="mode-btn-titre">Système</div>
+                    <div class="mode-btn-desc">Suit les paramètres système</div>
+                </div>
+            </button>
+            <button class="mode-btn" data-mode="clair">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2"/>
+                    <path d="M12 20v2"/>
+                    <path d="m4.93 4.93 1.41 1.41"/>
+                    <path d="m17.66 17.66 1.41 1.41"/>
+                    <path d="M2 12h2"/>
+                    <path d="M20 12h2"/>
+                    <path d="m6.34 17.66-1.41 1.41"/>
+                    <path d="m19.07 4.93-1.41 1.41"/>
+                </svg>
+                <div class="mode-btn-texte">
+                    <div class="mode-btn-titre">Clair</div>
+                    <div class="mode-btn-desc">Thème lumineux</div>
+                </div>
+            </button>
+            <button class="mode-btn" data-mode="sombre">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                </svg>
+                <div class="mode-btn-texte">
+                    <div class="mode-btn-titre">Sombre</div>
+                    <div class="mode-btn-desc">Thème sombre</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Écran Onboarding -->
+    <div class="ecran ecran-onboarding" id="ecran-onboarding">
+        <div class="onboarding-conteneur">
+            <div class="onboarding-slides">
+                <div class="onboarding-slide actif" data-slide="0">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 8v4l3 3"/>
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Historique complet</h3>
+                    <p class="onboarding-desc">Gardez une trace de tous vos mouvements de stock avec un historique détaillé et consultable.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="1">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="m19 9-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Analyses détaillées</h3>
+                    <p class="onboarding-desc">Suivez vos quantités, achats, ventes et pertes avec des calculs automatiques et précis.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="2">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Multi-utilisateurs</h3>
+                    <p class="onboarding-desc">Collaborez avec votre équipe et gérez les accès et autorisations de chaque membre.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="3">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Sauvegarde cloud</h3>
+                    <p class="onboarding-desc">Vos données sont automatiquement sauvegardées et accessibles depuis n'importe quel appareil.</p>
+                </div>
+            </div>
+            <div class="onboarding-indicateurs">
+                <div class="onboarding-indicateur actif"></div>
+                <div class="onboarding-indicateur"></div>
+                <div class="onboarding-indicateur"></div>
+                <div class="onboarding-indicateur"></div>
+            </div>
+            <button class="onboarding-btn" id="btn-onboarding-suivant">Suivant</button>
+        </div>
+    </div>
+
+    <!-- Écran Authentification -->
+    <div class="ecran ecran-auth" id="ecran-auth">
+        <div class="auth-contenu">
+            <div class="auth-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+            </div>
+            <h2 class="auth-titre">Bienvenue</h2>
+            <p class="auth-desc">Connectez-vous avec votre compte Google pour accéder à votre espace de gestion de stock.</p>
+            <button class="google-btn" id="btn-google">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continuer avec Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Écran Choix Entreprise -->
+    <div class="ecran ecran-choix-entreprise" id="ecran-choix-entreprise">
+        <div class="choix-contenu">
+            <h2 class="choix-titre">Commencer</h2>
+            <button class="choix-btn" id="btn-creer-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14"/>
+                    <path d="M5 12h14"/>
+                </svg>
+                <span class="choix-btn-titre">Créer une entreprise</span>
+                <span class="choix-btn-desc">Configurez votre nouvelle entreprise</span>
+            </button>
+            <button class="choix-btn" id="btn-rejoindre-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <line x1="19" y1="8" x2="19" y2="14"/>
+                    <line x1="22" y1="11" x2="16" y2="11"/>
+                </svg>
+                <span class="choix-btn-titre">Rejoindre une entreprise</span>
+                <span class="choix-btn-desc">Scannez un QR code pour rejoindre</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Écran Créer Entreprise -->
+    <div class="ecran ecran-creer-entreprise" id="ecran-creer-entreprise">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-choix">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Créer une entreprise</h2>
+        </div>
+        <div class="formulaire-contenu">
+            <div class="formulaire-section">
+                <label class="formulaire-label">Logo de l'entreprise</label>
+                <div class="logo-upload">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="9" cy="9" r="2"/>
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    </svg>
+                    <span class="logo-upload-texte">Ajouter</span>
+                </div>
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Nom de l'entreprise</label>
+                <input type="text" class="formulaire-input" placeholder="Ex: Mon Entreprise" id="input-nom-entreprise">
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Description (optionnel)</label>
+                <textarea class="formulaire-input formulaire-textarea" placeholder="Décrivez votre entreprise..." id="input-description"></textarea>
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Devise</label>
+                <input type="text" class="formulaire-input" placeholder="Ex: USD, EUR, CDF..." id="input-devise">
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Thème</label>
+                <div class="theme-grille">
+                    <div class="theme-option actif" style="background: #2d3436;" data-theme="#2d3436"></div>
+                    <div class="theme-option" style="background: #00b894;" data-theme="#00b894"></div>
+                    <div class="theme-option" style="background: #0984e3;" data-theme="#0984e3"></div>
+                    <div class="theme-option" style="background: #6c5ce7;" data-theme="#6c5ce7"></div>
+                    <div class="theme-option" style="background: #e17055;" data-theme="#e17055"></div>
+                    <div class="theme-option" style="background: #fdcb6e;" data-theme="#fdcb6e"></div>
+                    <div class="theme-option" style="background: #00cec9;" data-theme="#00cec9"></div>
+                    <div class="theme-option" style="background: #fd79a8;" data-theme="#fd79a8"></div>
+                </div>
+            </div>
+            <button class="btn-valider" id="btn-valider-entreprise">Créer l'entreprise</button>
+        </div>
+    </div>
+
+    <!-- Écran Accueil -->
+    <div class="ecran ecran-accueil" id="ecran-accueil">
+        <div class="accueil-entete">
+            <div class="accueil-entete-gauche">
+                <div class="accueil-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                    </svg>
+                </div>
+                <span class="accueil-nom-entreprise">Mon Entreprise</span>
+            </div>
+            <button class="notification-btn" id="btn-notifications">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+                <span class="notification-badge"></span>
+            </button>
+        </div>
+        <div class="accueil-contenu">
+            <div class="accueil-bienvenue">
+                <h2 class="accueil-bienvenue-titre">Bonjour, Jean</h2>
+                <p class="accueil-bienvenue-texte">Voici l'état de votre stock aujourd'hui</p>
+            </div>
+            <div class="statistiques-grille">
+                <div class="stat-carte">
+                    <div class="stat-icone stocks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">156</div>
+                    <div class="stat-label">En stock</div>
+                </div>
+                <div class="stat-carte">
+                    <div class="stat-icone faible">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">12</div>
+                    <div class="stat-label">Stock faible</div>
+                </div>
+                <div class="stat-carte">
+                    <div class="stat-icone rupture">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">3</div>
+                    <div class="stat-label">Rupture</div>
+                </div>
+                <div class="stat-carte">
+                    <div class="stat-icone valeur">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">45 280 $</div>
+                    <div class="stat-label">Valeur totale</div>
+                </div>
+            </div>
+            <h3 class="section-titre">Mouvements récents</h3>
+            <div class="mouvements-recents" id="mouvements-recents">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Écran Produits -->
+    <div class="ecran ecran-produits" id="ecran-produits">
+        <div class="produits-entete">
+            <div class="produits-recherche">
+                <div class="recherche-input-conteneur">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" class="recherche-input" placeholder="Rechercher un produit...">
+                </div>
+                <button class="scanner-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                        <line x1="7" y1="12" x2="17" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="produits-onglets">
+                <button class="onglet-btn actif">Tous <span class="onglet-nombre">89</span></button>
+                <button class="onglet-btn">En stock <span class="onglet-nombre">74</span></button>
+                <button class="onglet-btn">Faible <span class="onglet-nombre">12</span></button>
+                <button class="onglet-btn">Rupture <span class="onglet-nombre">3</span></button>
+            </div>
+        </div>
+        <div class="produits-liste" id="produits-liste">
+            <!-- Rempli dynamiquement -->
+        </div>
+        <button class="btn-flottant" id="btn-ajout-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Écran Historique -->
+    <div class="ecran ecran-historique" id="ecran-historique">
+        <div class="historique-entete">
+            <h2 class="historique-titre">Historique</h2>
+            <div class="historique-filtres">
+                <button class="filtre-btn actif">Tous <span>247</span></button>
+                <button class="filtre-btn">Entrées <span>142</span></button>
+                <button class="filtre-btn">Sorties <span>89</span></button>
+                <button class="filtre-btn">Inventaires <span>16</span></button>
+            </div>
+            <div class="date-select">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Cette semaine</span>
+            </div>
+        </div>
+        <div class="historique-liste" id="historique-liste">
+            <!-- Rempli dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Écran Notifications -->
+    <div class="ecran ecran-notifications" id="ecran-notifications">
+        <div class="notifications-entete">
+            <h2 class="notifications-titre">Notifications</h2>
+            <div class="notifications-onglets">
+                <button class="notif-onglet actif">Tous</button>
+                <button class="notif-onglet">Non lu <span>5</span></button>
+            </div>
+        </div>
+        <div class="notifications-liste" id="notifications-liste">
+            <!-- Rempli dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Écran Rapports -->
+    <div class="ecran ecran-rapports" id="ecran-rapports">
+        <div class="rapports-entete">
+            <h2 class="rapports-titre">Rapports</h2>
+        </div>
+        <div class="rapports-contenu">
+            <div class="rapport-section">
+                <h3 class="rapport-section-titre">Rapports d'actualité</h3>
+                <div class="rapport-carte" data-rapport="global">
+                    <div class="rapport-icone stocks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">État global du stock</div>
+                        <div class="rapport-nombre">89 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="stock">
+                    <div class="rapport-icone stocks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">En stock</div>
+                        <div class="rapport-nombre">74 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="faible">
+                    <div class="rapport-icone faible">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Stock faible</div>
+                        <div class="rapport-nombre">12 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="rupture">
+                    <div class="rapport-icone rupture">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Rupture de stock</div>
+                        <div class="rapport-nombre">3 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="surstock">
+                    <div class="rapport-icone surstock">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18 17V9"/>
+                            <path d="M13 17V5"/>
+                            <path d="M8 17v-3"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Surstock</div>
+                        <div class="rapport-nombre">8 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="rapport-section">
+                <h3 class="rapport-section-titre">Rapports budgétaires</h3>
+                <div class="rapport-carte" data-rapport="achats">
+                    <div class="rapport-icone achat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Achats</div>
+                        <div class="rapport-nombre">12 450 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="ventes">
+                    <div class="rapport-icone vente">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Ventes</div>
+                        <div class="rapport-nombre">28 760 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="pertes">
+                    <div class="rapport-icone perte">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="m7 14 4-4 4 4 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Pertes</div>
+                        <div class="rapport-nombre">1 250 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="finance">
+                    <div class="rapport-icone finance">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Rapport financier</div>
+                        <div class="rapport-nombre">Bénéfice: 16 310 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Écran Aperçu Rapport -->
+    <div class="ecran ecran-apercu-rapport" id="ecran-apercu-rapport">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-rapports">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre" id="rapport-titre">État global du stock</h2>
+        </div>
+        <div class="rapport-entete-document">
+            <div class="rapport-entreprise">
+                <div class="rapport-entreprise-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="rapport-entreprise-nom">Mon Entreprise</div>
+                </div>
+            </div>
+            <div class="rapport-titre-document" id="rapport-soustitre">Rapport concernant l'état global du stock</div>
+            <div class="rapport-meta">
+                <div class="rapport-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;stroke:currentColor">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span id="rapport-date">Date: 15 Janvier 2025</span>
+                </div>
+                <div class="rapport-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;stroke:currentColor">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                    <span id="rapport-nombre">89 articles</span>
+                </div>
+                <div class="rapport-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;stroke:currentColor">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Responsable: Jean Dupont</span>
+                </div>
+            </div>
+        </div>
+        <div class="rapport-tableau-conteneur" id="rapport-tableau-conteneur">
+            <!-- Tableau généré dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Écran Menu -->
+    <div class="ecran ecran-menu" id="ecran-menu">
+        <div class="menu-entete">
+            <div class="menu-profil">
+                <div class="menu-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="menu-profil-nom">Jean Dupont</div>
+                    <div class="menu-profil-email">jean.dupont@email.com</div>
+                </div>
+            </div>
+        </div>
+        <div class="menu-contenu">
+            <div class="menu-section">
+                <div class="menu-section-titre">Général</div>
+                <div class="menu-item" id="menu-entreprise">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                    </svg>
+                    <span class="menu-item-texte">Entreprise</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menu-langue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span class="menu-item-texte">Langue</span>
+                    <div class="menu-item-droite">
+                        <span style="font-size:13px;color:var(--texte-secondaire)">Français</span>
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menu-mode">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <span class="menu-item-texte">Mode sombre</span>
+                    <div class="menu-interrupteur" id="toggle-mode"></div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-section-titre">Sécurité</div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <span class="menu-item-texte">Code PIN</span>
+                    <div class="menu-interrupteur"></div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span class="menu-item-texte">Verrouillage biométrique</span>
+                    <div class="menu-interrupteur"></div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="menu-item-texte">Question de sécurité</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-section-titre">Données</div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span class="menu-item-texte">Sauvegarder</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span class="menu-item-texte">Restaurer</span>
+                    <div class="menu-item-droite">
+                        <span style="font-size:11px;color:var(--texte-tertiaire)">Admin</span>
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                    </svg>
+                    <span class="menu-item-texte">Cloud</span>
+                    <div class="menu-item-droite">
+                        <span style="font-size:12px;color:var(--succes)">Synchronisé</span>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-section-titre">Support</div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="menu-item-texte">Aide et support</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="menu-item-texte">Évaluer l'application</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-item menu-danger">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    <span class="menu-item-texte">Se déconnecter</span>
+                </div>
+                <div class="menu-item menu-danger">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    <span class="menu-item-texte">Supprimer le compte</span>
+                </div>
+            </div>
+        </div>
+        <div class="menu-version">StockMvt v1.0.0</div>
+    </div>
+
+    <!-- Écran Entreprise -->
+    <div class="ecran ecran-entreprise" id="ecran-entreprise">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-menu-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Entreprise</h2>
+        </div>
+        <div class="entreprise-entete">
+            <div class="entreprise-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18"/>
+                    <path d="M5 21V7l8-4v18"/>
+                    <path d="M19 21V11l-6-4"/>
+                </svg>
+            </div>
+            <h2 class="entreprise-nom">Mon Entreprise</h2>
+            <p class="entreprise-description">Commerce de gros et détail de produits alimentaires</p>
+            <p class="entreprise-devise">Devise: USD</p>
+        </div>
+        <div class="entreprise-contenu">
+            <div class="entreprise-boutons">
+                <button class="entreprise-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    <span>Éditer</span>
+                </button>
+                <button class="entreprise-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <line x1="19" y1="8" x2="19" y2="14"/>
+                        <line x1="22" y1="11" x2="16" y2="11"/>
+                    </svg>
+                    <span>Ajouter</span>
+                </button>
+                <button class="entreprise-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18"/>
+                        <path d="M9 21V9"/>
+                    </svg>
+                    <span>Changer</span>
+                </button>
+                <button class="entreprise-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                        <path d="M9 22h6"/>
+                    </svg>
+                    <span>QR Code</span>
+                </button>
+            </div>
+            <div class="utilisateurs-section">
+                <h3 class="utilisateurs-titre">Utilisateurs (3)</h3>
+                <div class="utilisateur-item">
+                    <div class="utilisateur-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="utilisateur-infos">
+                        <div class="utilisateur-nom">Jean Dupont</div>
+                        <div class="utilisateur-role">jean.dupont@email.com</div>
+                    </div>
+                    <span class="badge-admin">Admin</span>
+                </div>
+                <div class="utilisateur-item">
+                    <div class="utilisateur-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="utilisateur-infos">
+                        <div class="utilisateur-nom">Marie Martin</div>
+                        <div class="utilisateur-role">marie.martin@email.com</div>
+                    </div>
+                </div>
+                <div class="utilisateur-item">
+                    <div class="utilisateur-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="utilisateur-infos">
+                        <div class="utilisateur-nom">Paul Durand</div>
+                        <div class="utilisateur-role">paul.durand@email.com</div>
+                    </div>
+                </div>
+            </div>
+            <button class="quitter-btn">Quitter cette entreprise</button>
+        </div>
+    </div>
+
+    <!-- Écran Détails Produit -->
+    <div class="ecran ecran-details-produit" id="ecran-details-produit">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-produits">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Détails du produit</h2>
+        </div>
+        <div class="details-actions">
+            <button class="action-btn entree" id="btn-entree">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14"/>
+                    <path d="m19 12-7 7-7-7"/>
+                </svg>
+                <span>Entrée</span>
+            </button>
+            <button class="action-btn sortie" id="btn-sortie">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19V5"/>
+                    <path d="m5 12 7-7 7 7"/>
+                </svg>
+                <span>Sortie</span>
+            </button>
+            <button class="action-btn" id="btn-inventaire">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                    <path d="m9 14 2 2 4-4"/>
+                </svg>
+                <span>Inventaire</span>
+            </button>
+        </div>
+        <div class="details-image">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+        </div>
+        <div class="details-contenu">
+            <h2 class="details-nom">Riz Premium 5kg</h2>
+            <p class="details-code">PRD-001 | 6123456789012</p>
+            
+            <div class="details-section">
+                <h4 class="details-section-titre">Informations de stock</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Quantité totale</div>
+                        <div class="details-item-valeur">156 unités</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Statut</div>
+                        <div class="details-item-valeur" style="color:var(--succes)">En stock</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Stock min.</div>
+                        <div class="details-item-valeur">20 unités</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Stock max.</div>
+                        <div class="details-item-valeur">500 unités</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Prix et marges</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Prix d'achat</div>
+                        <div class="details-item-valeur">8.50 $</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Prix de vente</div>
+                        <div class="details-item-valeur">12.00 $</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Bénéfice unit.</div>
+                        <div class="details-item-valeur" style="color:var(--succes)">3.50 $</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Marge</div>
+                        <div class="details-item-valeur" style="color:var(--succes)">29.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Emplacements</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Entrepôt A - Rayon 3</div>
+                        <div class="details-item-valeur">100 unités</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Magasin - Étagère B2</div>
+                        <div class="details-item-valeur">56 unités</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Informations supplémentaires</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Date d'ajout</div>
+                        <div class="details-item-valeur" style="font-size:14px">10 Jan 2025</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Dernière modif.</div>
+                        <div class="details-item-valeur" style="font-size:14px">15 Jan 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="details-modifier-btn">Modifier le produit</button>
+        </div>
+    </div>
+
+    <!-- Écran Ajout Produit -->
+    <div class="ecran ecran-ajout-produit" id="ecran-ajout-produit">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-ajout">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Nouveau produit</h2>
+        </div>
+        <div class="ajout-image-zone">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+            <span>Prendre une photo ou sélectionner</span>
+        </div>
+        <div class="ajout-formulaire">
+            <div class="ajout-champ">
+                <label class="ajout-champ-label">Nom du produit *</label>
+                <input type="text" class="ajout-input" placeholder="Ex: Riz Premium 5kg">
+            </div>
+            <div class="ajout-champ">
+                <label class="ajout-champ-label">Code produit / Code-barres</label>
+                <div class="ajout-input-avec-icones">
+                    <input type="text" class="ajout-input" placeholder="Ex: PRD-001">
+                    <button class="ajout-icone-btn" title="Générer un code">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                            <path d="M21 3v5h-5"/>
+                        </svg>
+                    </button>
+                    <button class="ajout-icone-btn" title="Scanner">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                            <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                            <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                            <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                            <line x1="7" y1="12" x2="17" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="ajout-champ">
+                <label class="ajout-champ-label">Catégorie</label>
+                <select class="ajout-input">
+                    <option value="">Sélectionner une catégorie</option>
+                    <option value="alimentaire">Alimentaire</option>
+                    <option value="boissons">Boissons</option>
+                    <option value="hygiene">Hygiène</option>
+                    <option value="menage">Ménage</option>
+                </select>
+            </div>
+            <div class="ajout-champ">
+                <label class="ajout-champ-label">Emplacement</label>
+                <input type="text" class="ajout-input" placeholder="Ex: Entrepôt A - Rayon 3">
+            </div>
+            <div class="ajout-ligne">
+                <div class="ajout-champ">
+                    <label class="ajout-champ-label">Quantité *</label>
+                    <input type="number" class="ajout-input" placeholder="0">
+                </div>
+                <div class="ajout-champ">
+                    <label class="ajout-champ-label">Quantité min.</label>
+                    <input type="number" class="ajout-input" placeholder="0">
+                </div>
+            </div>
+            <div class="ajout-ligne">
+                <div class="ajout-champ">
+                    <label class="ajout-champ-label">Prix d'achat unit.</label>
+                    <input type="number" class="ajout-input" placeholder="0.00">
+                </div>
+                <div class="ajout-champ">
+                    <label class="ajout-champ-label">Prix de vente unit.</label>
+                    <input type="number" class="ajout-input" placeholder="0.00">
+                </div>
+            </div>
+            <div class="ajout-prix-section">
+                <div class="ajout-prix-ligne">
+                    <span class="ajout-prix-label">Valeur totale d'achat</span>
+                    <span class="ajout-prix-valeur">0.00 $</span>
+                </div>
+                <div class="ajout-prix-ligne">
+                    <span class="ajout-prix-label">Valeur totale de vente</span>
+                    <span class="ajout-prix-valeur">0.00 $</span>
+                </div>
+                <div class="ajout-prix-ligne">
+                    <span class="ajout-prix-label">Bénéfice potentiel</span>
+                    <span class="ajout-prix-valeur positif">0.00 $</span>
+                </div>
+                <div class="ajout-prix-ligne">
+                    <span class="ajout-prix-label">Marge bénéficiaire</span>
+                    <span class="ajout-prix-valeur positif">0%</span>
+                </div>
+            </div>
+            <div class="ajout-champ">
+                <label class="ajout-champ-label">Notes</label>
+                <textarea class="ajout-input" placeholder="Ajouter des notes..." style="min-height:80px"></textarea>
+            </div>
+            <button class="ajout-enregistrer-btn">Enregistrer le produit</button>
+        </div>
+    </div>
+
+    <!-- Navigation principale -->
+    <nav class="nav-principale" id="nav-principale" style="display:none">
+        <button class="nav-item actif" data-ecran="ecran-accueil">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Accueil</span>
+        </button>
+        <button class="nav-item" data-ecran="ecran-produits">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+            <span>Produits</span>
+        </button>
+        <button class="nav-item" data-ecran="ecran-historique">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>Historique</span>
+        </button>
+        <button class="nav-item" data-ecran="ecran-rapports">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+            <span>Rapports</span>
+        </button>
+        <button class="nav-item" data-ecran="ecran-menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="12" x2="20" y2="12"/>
+                <line x1="4" y1="6" x2="20" y2="6"/>
+                <line x1="4" y1="18" x2="20" y2="18"/>
+            </svg>
+            <span>Menu</span>
+        </button>
+    </nav>
+
+    <!-- Modal Mouvement -->
+    <div class="modal-overlay" id="modal-mouvement">
+        <div class="modal-contenu">
+            <div class="modal-entete">
+                <h3 class="modal-titre" id="modal-titre">Entrée de stock</h3>
+                <button class="modal-fermer" id="fermer-modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-corps">
+                <form class="mouvement-formulaire">
+                    <div class="mouvement-champ">
+                        <label>Motif</label>
+                        <select class="mouvement-select">
+                            <option>Achat</option>
+                            <option>Don</option>
+                            <option>Transfert</option>
+                            <option>Retour</option>
+                            <option>Autre</option>
+                        </select>
+                    </div>
+                    <div class="mouvement-champ">
+                        <label>Emplacement</label>
+                        <select class="mouvement-select">
+                            <option>Entrepôt A - Rayon 3 (100 unités)</option>
+                            <option>Magasin - Étagère B2 (56 unités)</option>
+                        </select>
+                    </div>
+                    <div class="mouvement-champ">
+                        <label>Quantité</label>
+                        <input type="number" class="ajout-input" placeholder="0">
+                    </div>
+                    <div class="mouvement-champ">
+                        <label>Prix unitaire d'achat</label>
+                        <input type="number" class="ajout-input" placeholder="0.00 $">
+                    </div>
+                    <div class="mouvement-apercu">
+                        <div class="mouvement-apercu-titre">Aperçu</div>
+                        <div class="mouvement-apercu-valeurs">
+                            <span class="apercu-valeur">156</span>
+                            <span class="apercu-fleche">→</span>
+                            <span class="apercu-valeur" style="color:var(--succes)">176</span>
+                        </div>
+                    </div>
+                    <div class="mouvement-champ">
+                        <label>Observations</label>
+                        <input type="text" class="ajout-input" placeholder="Ajouter une note...">
+                    </div>
+                    <button type="button" class="mouvement-valider-btn">Valider</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DONNÉES ====================
+        const traductions = {
+            fr: {
+                titre: "StockMvt",
+                bienvenue: "Bienvenue",
+                continuer: "Continuer",
+                suivant: "Suivant",
+                creer: "Créer une entreprise",
+                rejoindre: "Rejoindre une entreprise",
+                valider: "Valider",
+                enregistrer: "Enregistrer",
+                annuler: "Annuler",
+                accueil: "Accueil",
+                produits: "Produits",
+                historique: "Historique",
+                rapports: "Rapports",
+                menu: "Menu",
+                enStock: "En stock",
+                stockFaible: "Stock faible",
+                rupture: "Rupture",
+                surstock: "Surstock",
+                entree: "Entrée",
+                sortie: "Sortie",
+                inventaire: "Inventaire",
+                achats: "Achats",
+                ventes: "Ventes",
+                pertes: "Pertes",
+                benefices: "Bénéfices"
+            }
+        };
+
+        const donneesProduits = [
+            { id: 1, nom: "Riz Premium 5kg", code: "PRD-001", codeBarres: "6123456789012", categorie: "Alimentaire", quantite: 156, min: 20, max: 500, prixAchat: 8.50, prixVente: 12.00, emplacement: "Entrepôt A", statut: "stock" },
+            { id: 2, nom: "Huile de palme 1L", code: "PRD-002", codeBarres: "6123456789013", categorie: "Alimentaire", quantite: 89, min: 30, max: 200, prixAchat: 3.20, prixVente: 5.00, emplacement: "Entrepôt A", statut: "stock" },
+            { id: 3, nom: "Sucre blanc 1kg", code: "PRD-003", codeBarres: "6123456789014", categorie: "Alimentaire", quantite: 15, min: 25, max: 150, prixAchat: 1.80, prixVente: 2.50, emplacement: "Magasin", statut: "faible" },
+            { id: 4, nom: "Farine de blé 2kg", code: "PRD-004", codeBarres: "6123456789015", categorie: "Alimentaire", quantite: 0, min: 20, max: 100, prixAchat: 2.50, prixVente: 4.00, emplacement: "Entrepôt B", statut: "rupture" },
+            { id: 5, nom: "Savon de ménage", code: "PRD-005", codeBarres: "6123456789016", categorie: "Hygiène", quantite: 234, min: 50, max: 200, prixAchat: 0.80, prixVente: 1.50, emplacement: "Magasin", statut: "surstock" },
+            { id: 6, nom: "Pâte dentifrice", code: "PRD-006", codeBarres: "6123456789017", categorie: "Hygiène", quantite: 67, min: 20, max: 100, prixAchat: 1.20, prixVente: 2.00, emplacement: "Magasin", statut: "stock" },
+            { id: 7, nom: "Café instantané 200g", code: "PRD-007", codeBarres: "6123456789018", categorie: "Boissons", quantite: 8, min: 15, max: 80, prixAchat: 4.50, prixVente: 7.00, emplacement: "Entrepôt A", statut: "faible" },
+            { id: 8, nom: "Lait concentré 400g", code: "PRD-008", codeBarres: "6123456789019", categorie: "Alimentaire", quantite: 145, min: 30, max: 150, prixAchat: 1.50, prixVente: 2.50, emplacement: "Magasin", statut: "stock" },
+            { id: 9, nom: "Eau minérale 1.5L", code: "PRD-009", codeBarres: "6123456789020", categorie: "Boissons", quantite: 0, min: 50, max: 300, prixAchat: 0.50, prixVente: 1.00, emplacement: "Entrepôt A", statut: "rupture" },
+            { id: 10, nom: "Jus d'orange 1L", code: "PRD-010", codeBarres: "6123456789021", categorie: "Boissons", quantite: 78, min: 20, max: 100, prixAchat: 2.00, prixVente: 3.50, emplacement: "Magasin", statut: "stock" },
+            { id: 11, nom: "Détergent 1kg", code: "PRD-011", codeBarres: "6123456789022", categorie: "Ménage", quantite: 12, min: 25, max: 100, prixAchat: 3.00, prixVente: 5.00, emplacement: "Entrepôt B", statut: "faible" },
+            { id: 12, nom: "Eponges (lot de 5)", code: "PRD-012", codeBarres: "6123456789023", categorie: "Ménage", quantite: 189, min: 30, max: 100, prixAchat: 1.00, prixVente: 2.00, emplacement: "Magasin", statut: "surstock" }
+        ];
+
+        const donneesHistorique = [
+            { id: 1, type: "entree", produit: "Riz Premium 5kg", quantite: 50, avant: 106, apres: 156, motif: "Achat", utilisateur: "Jean Dupont", date: "2025-01-15", heure: "14:30", observations: "Livraison fournisseur ABC" },
+            { id: 2, type: "sortie", produit: "Huile de palme 1L", quantite: 24, avant: 113, apres: 89, motif: "Vente", utilisateur: "Marie Martin", date: "2025-01-15", heure: "11:45", observations: "Vente client grossiste" },
+            { id: 3, type: "entree", produit: "Sucre blanc 1kg", quantite: 100, avant: 0, apres: 100, motif: "Achat", utilisateur: "Jean Dupont", date: "2025-01-14", heure: "09:15", observations: "" },
+            { id: 4, type: "inventaire", produit: "Savon de ménage", quantite: -10, avant: 244, apres: 234, motif: "Correction", utilisateur: "Paul Durand", date: "2025-01-14", heure: "16:00", observations: "Produits endommagés" },
+            { id: 5, type: "sortie", produit: "Café instantané 200g", quantite: 7, avant: 15, apres: 8, motif: "Vente", utilisateur: "Marie Martin", date: "2025-01-13", heure: "10:30", observations: "" },
+            { id: 6, type: "entree", produit: "Lait concentré 400g", quantite: 45, avant: 100, apres: 145, motif: "Transfert", utilisateur: "Jean Dupont", date: "2025-01-13", heure: "08:00", observations: "Transfert du dépôt central" },
+            { id: 7, type: "sortie", produit: "Eau minérale 1.5L", quantite: 120, avant: 120, apres: 0, motif: "Vente", utilisateur: "Marie Martin", date: "2025-01-12", heure: "15:20", observations: "Commande spéciale événement" },
+            { id: 8, type: "entree", produit: "Jus d'orange 1L", quantite: 30, avant: 48, apres: 78, motif: "Achat", utilisateur: "Jean Dupont", date: "2025-01-12", heure: "11:00", observations: "" }
+        ];
+
+        const donneesNotifications = [
+            { id: 1, type: "faible", titre: "Stock faible", desc: "Sucre blanc 1kg - 15 unités restantes", date: "Il y a 2h", lu: false },
+            { id: 2, type: "faible", titre: "Stock faible", desc: "Café instantané 200g - 8 unités restantes", date: "Il y a 5h", lu: false },
+            { id: 3, type: "rupture", titre: "Rupture de stock", desc: "Farine de blé 2kg - Stock épuisé", date: "Hier", lu: false },
+            { id: 4, type: "rupture", titre: "Rupture de stock", desc: "Eau minérale 1.5L - Stock épuisé", date: "Hier", lu: false },
+            { id: 5, type: "surstock", titre: "Surstock détecté", desc: "Savon de ménage - 234 unités (max: 200)", date: "Il y a 2 jours", lu: true },
+            { id: 6, type: "surstock", titre: "Surstock détecté", desc: "Eponges (lot de 5) - 189 unités (max: 100)", date: "Il y a 3 jours", lu: true },
+            { id: 7, type: "faible", titre: "Stock faible", desc: "Détergent 1kg - 12 unités restantes", date: "Il y a 3 jours", lu: true }
+        ];
+
+        // ==================== ÉTAT ====================
+        let ecranActuel = "ecran-langue";
+        let slideOnboarding = 0;
+        let modeSombre = false;
+
+        // ==================== FONCTIONS UTILITAIRES ====================
+        function afficherEcran(idEcran) {
+            document.querySelectorAll(".ecran").forEach(e => e.classList.remove("actif"));
+            const ecran = document.getElementById(idEcran);
+            if (ecran) {
+                ecran.classList.add("actif");
+                ecranActuel = idEcran;
+            }
+            
+            const nav = document.getElementById("nav-principale");
+            const ecransAvecNav = ["ecran-accueil", "ecran-produits", "ecran-historique", "ecran-rapports", "ecran-menu"];
+            nav.style.display = ecransAvecNav.includes(idEcran) ? "flex" : "none";
+        }
+
+        function formaterDate(dateStr) {
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            return new Date(dateStr).toLocaleDateString('fr-FR', options);
+        }
+
+        function obtenirStatutClass(statut) {
+            const classes = {
+                stock: "stock",
+                faible: "faible",
+                rupture: "rupture",
+                surstock: "surstock"
+            };
+            return classes[statut] || "stock";
+        }
+
+        function obtenirStatutTexte(statut) {
+            const textes = {
+                stock: "En stock",
+                faible: "Stock faible",
+                rupture: "Rupture",
+                surstock: "Surstock"
+            };
+            return textes[statut] || "En stock";
+        }
+
+        // ==================== RENDU ====================
+        function rendreMouvementsRecents() {
+            const conteneur = document.getElementById("mouvements-recents");
+            if (!conteneur) return;
+            
+            conteneur.innerHTML = donneesHistorique.slice(0, 4).map(m => {
+                const iconeClass = m.type === "entree" ? "entree" : m.type === "sortie" ? "sortie" : "inventaire";
+                const iconePath = m.type === "entree" 
+                    ? '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>'
+                    : m.type === "sortie"
+                    ? '<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>'
+                    : '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/>';
+                
+                return `
+                    <div class="mouvement-item">
+                        <div class="mouvement-icone ${iconeClass}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconePath}</svg>
+                        </div>
+                        <div class="mouvement-infos">
+                            <div class="mouvement-produit">${m.produit}</div>
+                            <div class="mouvement-detail">${m.motif} - ${m.utilisateur}</div>
+                        </div>
+                        <div class="mouvement-quantite ${m.type === "entree" ? "positif" : "negatif"}">
+                            ${m.type === "entree" ? "+" : "-"}${m.quantite}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function rendreProduits() {
+            const conteneur = document.getElementById("produits-liste");
+            if (!conteneur) return;
+            
+            const categories = {};
+            donneesProduits.forEach(p => {
+                const cat = p.categorie || "Sans catégorie";
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(p);
+            });
+            
+            conteneur.innerHTML = Object.entries(categories).map(([cat, produits]) => `
+                <div class="categorie-section">
+                    <div class="categorie-entete">
+                        <div class="categorie-gauche">
+                            <span class="categorie-nom">${cat}</span>
+                            <span class="categorie-nombre">${produits.length}</span>
+                        </div>
+                        <div class="categorie-toggle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="categorie-produits">
+                        ${produits.map(p => `
+                            <div class="produit-carte" data-id="${p.id}">
+                                <div class="produit-image">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                        <circle cx="9" cy="9" r="2"/>
+                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                                    </svg>
+                                </div>
+                                <div class="produit-infos">
+                                    <div class="produit-nom">${p.nom}</div>
+                                    <div class="produit-code">${p.code}</div>
+                                </div>
+                                <div class="produit-droite">
+                                    <div class="produit-quantite">${p.quantite}</div>
+                                    <span class="produit-statut ${obtenirStatutClass(p.statut)}">${obtenirStatutTexte(p.statut)}</span>
+                                </div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `).join("");
+            
+            // Toggle catégories
+            conteneur.querySelectorAll(".categorie-entete").forEach(entete => {
+                entete.addEventListener("click", () => {
+                    entete.closest(".categorie-section").classList.toggle("ferme");
+                });
+            });
+            
+            // Clic produit
+            conteneur.querySelectorAll(".produit-carte").forEach(carte => {
+                carte.addEventListener("click", () => {
+                    afficherEcran("ecran-details-produit");
+                });
+            });
+        }
+
+        function rendreHistorique() {
+            const conteneur = document.getElementById("historique-liste");
+            if (!conteneur) return;
+            
+            const parDate = {};
+            donneesHistorique.forEach(h => {
+                if (!parDate[h.date]) parDate[h.date] = [];
+                parDate[h.date].push(h);
+            });
+            
+            conteneur.innerHTML = Object.entries(parDate).map(([date, items]) => `
+                <div class="historique-jour">
+                    <div class="historique-date">${formaterDate(date)}</div>
+                    ${items.map(h => {
+                        const iconeClass = h.type === "entree" ? "entree" : h.type === "sortie" ? "sortie" : "inventaire";
+                        const iconePath = h.type === "entree" 
+                            ? '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>'
+                            : h.type === "sortie"
+                            ? '<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>'
+                            : '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/>';
+                        const typeTexte = h.type === "entree" ? "Entrée" : h.type === "sortie" ? "Sortie" : "Inventaire";
+                        
+                        return `
+                            <div class="historique-item">
+                                <div class="historique-item-entete">
+                                    <div class="historique-type-icone ${iconeClass}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconePath}</svg>
+                                    </div>
+                                    <span class="historique-type">${typeTexte}</span>
+                                    <span class="historique-heure">${h.heure}</span>
+                                </div>
+                                <div class="historique-produit">${h.produit}</div>
+                                <div class="historique-details">
+                                    <span class="historique-detail">Motif: ${h.motif}</span>
+                                    <span class="historique-detail">Par: ${h.utilisateur}</span>
+                                    ${h.observations ? `<span class="historique-detail">Note: ${h.observations}</span>` : ""}
+                                </div>
+                                <div class="historique-quantites">
+                                    <span class="quantite-badge avant">Avant: ${h.avant}</span>
+                                    <span class="quantite-badge apres">Après: ${h.apres}</span>
+                                    <span class="quantite-badge final">Final: ${h.apres}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+            `).join("");
+        }
+
+        function rendreNotifications() {
+            const conteneur = document.getElementById("notifications-liste");
+            if (!conteneur) return;
+            
+            conteneur.innerHTML = donneesNotifications.map(n => {
+                const iconePath = n.type === "faible" 
+                    ? '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+                    : n.type === "rupture"
+                    ? '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'
+                    : '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>';
+                
+                return `
+                    <div class="notification-carte ${n.lu ? "" : "non-lue"} ${n.type}">
+                        <div class="notification-icone ${n.type}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconePath}</svg>
+                        </div>
+                        <div class="notification-contenu">
+                            <div class="notification-titre">${n.titre}</div>
+                            <div class="notification-desc">${n.desc}</div>
+                            <div class="notification-date">${n.date}</div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function rendreTableauRapport(typeRapport) {
+            const conteneur = document.getElementById("rapport-tableau-conteneur");
+            if (!conteneur) return;
+            
+            let tableauHTML = "";
+            
+            if (typeRapport === "global" || typeRapport === "stock") {
+                const produits = typeRapport === "stock" ? donneesProduits.filter(p => p.statut === "stock") : donneesProduits;
+                tableauHTML = `
+                    <table class="rapport-tableau">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Code</th>
+                                <th>Désignation</th>
+                                <th>Catégorie</th>
+                                <th>Qté</th>
+                                <th>Min</th>
+                                <th>Max</th>
+                                <th>P.Achat</th>
+                                <th>P.Vente</th>
+                                <th>Valeur achat</th>
+                                <th>Valeur vente</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${produits.map((p, i) => `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td style="font-family:JetBrains Mono,monospace;font-size:11px">${p.code}</td>
+                                    <td>${p.nom}</td>
+                                    <td>${p.categorie}</td>
+                                    <td style="font-weight:600">${p.quantite}</td>
+                                    <td>${p.min}</td>
+                                    <td>${p.max}</td>
+                                    <td>${p.prixAchat.toFixed(2)} $</td>
+                                    <td>${p.prixVente.toFixed(2)} $</td>
+                                    <td>${(p.quantite * p.prixAchat).toFixed(2)} $</td>
+                                    <td>${(p.quantite * p.prixVente).toFixed(2)} $</td>
+                                    <td><span class="produit-statut ${obtenirStatutClass(p.statut)}">${obtenirStatutTexte(p.statut)}</span></td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                    <div class="rapport-total">
+                        <span class="rapport-total-label">Valeur totale du stock</span>
+                        <span class="rapport-total-valeur">${produits.reduce((acc, p) => acc + p.quantite * p.prixAchat, 0).toFixed(2)} $</span>
+                    </div>
+                `;
+            } else if (typeRapport === "faible") {
+                const produits = donneesProduits.filter(p => p.statut === "faible");
+                tableauHTML = `
+                    <table class="rapport-tableau">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Code</th>
+                                <th>Désignation</th>
+                                <th>Catégorie</th>
+                                <th>Qté actuelle</th>
+                                <th>Qté min</th>
+                                <th>À commander</th>
+                                <th>Valeur achat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${produits.map((p, i) => `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td style="font-family:JetBrains Mono,monospace;font-size:11px">${p.code}</td>
+                                    <td>${p.nom}</td>
+                                    <td>${p.categorie}</td>
+                                    <td style="font-weight:600;color:var(--attention)">${p.quantite}</td>
+                                    <td>${p.min}</td>
+                                    <td style="color:var(--info)">${p.min - p.quantite}</td>
+                                    <td>${((p.min - p.quantite) * p.prixAchat).toFixed(2)} $</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                    <div class="rapport-total">
+                        <span class="rapport-total-label">Valeur à commander</span>
+                        <span class="rapport-total-valeur">${produits.reduce((acc, p) => acc + (p.min - p.quantite) * p.prixAchat, 0).toFixed(2)} $</span>
+                    </div>
+                `;
+            } else if (typeRapport === "rupture") {
+                const produits = donneesProduits.filter(p => p.statut === "rupture");
+                tableauHTML = `
+                    <table class="rapport-tableau">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Code</th>
+                                <th>Désignation</th>
+                                <th>Catégorie</th>
+                                <th>Qté min</th>
+                                <th>Qté à commander</th>
+                                <th>Valeur achat estimée</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${produits.map((p, i) => `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td style="font-family:JetBrains Mono,monospace;font-size:11px">${p.code}</td>
+                                    <td>${p.nom}</td>
+                                    <td>${p.categorie}</td>
+                                    <td>${p.min}</td>
+                                    <td style="color:var(--danger);font-weight:600">${p.min}</td>
+                                    <td>${(p.min * p.prixAchat).toFixed(2)} $</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                    <div class="rapport-total">
+                        <span class="rapport-total-label">Valeur à commander (urgent)</span>
+                        <span class="rapport-total-valeur" style="color:var(--danger)">${produits.reduce((acc, p) => acc + p.min * p.prixAchat, 0).toFixed(2)} $</span>
+                    </div>
+                `;
+            } else if (typeRapport === "ventes") {
+                const ventes = donneesHistorique.filter(h => h.type === "sortie" && h.motif === "Vente");
+                tableauHTML = `
+                    <table class="rapport-tableau">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Date</th>
+                                <th>Heure</th>
+                                <th>Produit</th>
+                                <th>Qté vendue</th>
+                                <th>P.U vente</th>
+                                <th>Total vente</th>
+                                <th>Vendeur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${ventes.map((v, i) => {
+                                const produit = donneesProduits.find(p => p.nom === v.produit);
+                                const prixUnitaire = produit ? produit.prixVente : 0;
+                                return `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${formaterDate(v.date)}</td>
+                                        <td>${v.heure}</td>
+                                        <td>${v.produit}</td>
+                                        <td style="font-weight:600">${v.quantite}</td>
+                                        <td>${prixUnitaire.toFixed(2)} $</td>
+                                        <td style="color:var(--succes);font-weight:600">${(v.quantite * prixUnitaire).toFixed(2)} $</td>
+                                        <td>${v.utilisateur}</td>
+                                    </tr>
+                                `;
+                            }).join("")}
+                        </tbody>
+                    </table>
+                    <div class="rapport-total">
+                        <span class="rapport-total-label">Total des ventes</span>
+                        <span class="rapport-total-valeur" style="color:var(--succes)">${ventes.reduce((acc, v) => {
+                            const produit = donneesProduits.find(p => p.nom === v.produit);
+                            return acc + v.quantite * (produit ? produit.prixVente : 0);
+                        }, 0).toFixed(2)} $</span>
+                    </div>
+                `;
+            } else if (typeRapport === "finance") {
+                const totalAchats = donneesHistorique.filter(h => h.type === "entree" && h.motif === "Achat").reduce((acc, h) => {
+                    const produit = donneesProduits.find(p => p.nom === h.produit);
+                    return acc + h.quantite * (produit ? produit.prixAchat : 0);
+                }, 0);
+                
+                const totalVentes = donneesHistorique.filter(h => h.type === "sortie" && h.motif === "Vente").reduce((acc, h) => {
+                    const produit = donneesProduits.find(p => p.nom === h.produit);
+                    return acc + h.quantite * (produit ? produit.prixVente : 0);
+                }, 0);
+                
+                const benefice = totalVentes - totalAchats;
+                const marge = totalVentes > 0 ? ((benefice / totalVentes) * 100).toFixed(1) : 0;
+                
+                tableauHTML = `
+                    <table class="rapport-tableau">
+                        <thead>
+                            <tr>
+                                <th>Intitulé</th>
+                                <th>Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight:600">Total des achats</td>
+                                <td style="color:var(--danger)">${totalAchats.toFixed(2)} $</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600">Total des ventes</td>
+                                <td style="color:var(--succes)">${totalVentes.toFixed(2)} $</td>
+                            </tr>
+                            <tr style="background:var(--fond-tertiaire)">
+                                <td style="font-weight:700">Bénéfice net</td>
+                                <td style="font-weight:700;color:${benefice >= 0 ? 'var(--succes)' : 'var(--danger)'}">${benefice.toFixed(2)} $</td>
+                            </tr>
+                            <tr style="background:var(--fond-tertiaire)">
+                                <td style="font-weight:700">Marge bénéficiaire</td>
+                                <td style="font-weight:700;color:var(--accent)">${marge}%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            conteneur.innerHTML = tableauHTML;
+        }
+
+        // ==================== ÉVÉNEMENTS ====================
+        document.addEventListener("DOMContentLoaded", () => {
+            // Langue
+            document.querySelectorAll(".langue-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    afficherEcran("ecran-mode");
+                });
+            });
+            
+            // Mode
+            document.querySelectorAll(".mode-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("actif"));
+                    btn.classList.add("actif");
+                    
+                    const mode = btn.dataset.mode;
+                    if (mode === "sombre") {
+                        document.documentElement.setAttribute("data-mode", "sombre");
+                        modeSombre = true;
+                    } else if (mode === "clair") {
+                        document.documentElement.removeAttribute("data-mode");
+                        modeSombre = false;
+                    } else {
+                        const prefereSombre = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                        if (prefereSombre) {
+                            document.documentElement.setAttribute("data-mode", "sombre");
+                            modeSombre = true;
+                        } else {
+                            document.documentElement.removeAttribute("data-mode");
+                            modeSombre = false;
+                        }
+                    }
+                    
+                    setTimeout(() => afficherEcran("ecran-onboarding"), 300);
+                });
+            });
+            
+            // Onboarding
+            const btnSuivant = document.getElementById("btn-onboarding-suivant");
+            if (btnSuivant) {
+                btnSuivant.addEventListener("click", () => {
+                    const slides = document.querySelectorAll(".onboarding-slide");
+                    const indicateurs = document.querySelectorAll(".onboarding-indicateur");
+                    
+                    if (slideOnboarding < slides.length - 1) {
+                        slides[slideOnboarding].classList.remove("actif");
+                        indicateurs[slideOnboarding].classList.remove("actif");
+                        slideOnboarding++;
+                        slides[slideOnboarding].classList.add("actif");
+                        indicateurs[slideOnboarding].classList.add("actif");
+                        btnSuivant.textContent = slideOnboarding === slides.length - 1 ? "Commencer" : "Suivant";
+                    } else {
+                        afficherEcran("ecran-auth");
+                    }
+                });
+            }
+            
+            // Auth Google
+            const btnGoogle = document.getElementById("btn-google");
+            if (btnGoogle) {
+                btnGoogle.addEventListener("click", () => {
+                    afficherEcran("ecran-choix-entreprise");
+                });
+            }
+            
+            // Créer entreprise
+            const btnCreer = document.getElementById("btn-creer-entreprise");
+            if (btnCreer) {
+                btnCreer.addEventListener("click", () => {
+                    afficherEcran("ecran-creer-entreprise");
+                });
+            }
+            
+            const retourChoix = document.getElementById("retour-choix");
+            if (retourChoix) {
+                retourChoix.addEventListener("click", () => {
+                    afficherEcran("ecran-choix-entreprise");
+                });
+            }
+            
+            // Thème sélection
+            document.querySelectorAll(".theme-option").forEach(opt => {
+                opt.addEventListener("click", () => {
+                    document.querySelectorAll(".theme-option").forEach(o => o.classList.remove("actif"));
+                    opt.classList.add("actif");
+                });
+            });
+            
+            // Valider entreprise
+            const btnValiderEntreprise = document.getElementById("btn-valider-entreprise");
+            if (btnValiderEntreprise) {
+                btnValiderEntreprise.addEventListener("click", () => {
+                    const nomEntreprise = document.getElementById("input-nom-entreprise").value;
+                    if (nomEntreprise) {
+                        document.querySelectorAll(".accueil-nom-entreprise, .entreprise-nom, .rapport-entreprise-nom").forEach(el => {
+                            el.textContent = nomEntreprise;
+                        });
+                    }
+                    afficherEcran("ecran-accueil");
+                    rendreMouvementsRecents();
+                    rendreProduits();
+                    rendreHistorique();
+                    rendreNotifications();
+                });
+            }
+            
+            // Navigation principale
+            document.querySelectorAll(".nav-item").forEach(item => {
+                item.addEventListener("click", () => {
+                    document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("actif"));
+                    item.classList.add("actif");
+                    afficherEcran(item.dataset.ecran);
+                });
+            });
+            
+            // Notifications depuis accueil
+            const btnNotifications = document.getElementById("btn-notifications");
+            if (btnNotifications) {
+                btnNotifications.addEventListener("click", () => {
+                    afficherEcran("ecran-notifications");
+                });
+            }
+            
+            // Ajout produit
+            const btnAjoutProduit = document.getElementById("btn-ajout-produit");
+            if (btnAjoutProduit) {
+                btnAjoutProduit.addEventListener("click", () => {
+                    afficherEcran("ecran-ajout-produit");
+                });
+            }
+            
+            // Retours
+            const retourProduits = document.getElementById("retour-produits");
+            if (retourProduits) {
+                retourProduits.addEventListener("click", () => {
+                    afficherEcran("ecran-produits");
+                });
+            }
+            
+            const retourAjout = document.getElementById("retour-ajout");
+            if (retourAjout) {
+                retourAjout.addEventListener("click", () => {
+                    afficherEcran("ecran-produits");
+                });
+            }
+            
+            const retourRapports = document.getElementById("retour-rapports");
+            if (retourRapports) {
+                retourRapports.addEventListener("click", () => {
+                    afficherEcran("ecran-rapports");
+                });
+            }
+            
+            const retourMenuEntreprise = document.getElementById("retour-menu-entreprise");
+            if (retourMenuEntreprise) {
+                retourMenuEntreprise.addEventListener("click", () => {
+                    afficherEcran("ecran-menu");
+                });
+            }
+            
+            // Menu entreprise
+            const menuEntreprise = document.getElementById("menu-entreprise");
+            if (menuEntreprise) {
+                menuEntreprise.addEventListener("click", () => {
+                    afficherEcran("ecran-entreprise");
+                });
+            }
+            
+            // Toggle mode depuis menu
+            const toggleMode = document.getElementById("toggle-mode");
+            if (toggleMode) {
+                toggleMode.addEventListener("click", () => {
+                    toggleMode.classList.toggle("actif");
+                    modeSombre = !modeSombre;
+                    if (modeSombre) {
+                        document.documentElement.setAttribute("data-mode", "sombre");
+                    } else {
+                        document.documentElement.removeAttribute("data-mode");
+                    }
+                });
+            }
+            
+            // Rapports
+            document.querySelectorAll(".rapport-carte").forEach(carte => {
+                carte.addEventListener("click", () => {
+                    const type = carte.dataset.rapport;
+                    const titre = carte.querySelector(".rapport-nom").textContent;
+                    document.getElementById("rapport-titre").textContent = titre;
+                    document.getElementById("rapport-soustitre").textContent = `Rapport concernant ${titre.toLowerCase()}`;
+                    rendreTableauRapport(type);
+                    afficherEcran("ecran-apercu-rapport");
+                });
+            });
+            
+            // Modals
+            const btnEntree = document.getElementById("btn-entree");
+            const btnSortie = document.getElementById("btn-sortie");
+            const btnInventaire = document.getElementById("btn-inventaire");
+            const modalMouvement = document.getElementById("modal-mouvement");
+            const fermerModal = document.getElementById("fermer-modal");
+            const modalTitre = document.getElementById("modal-titre");
+            
+            if (btnEntree) {
+                btnEntree.addEventListener("click", () => {
+                    modalTitre.textContent = "Entrée de stock";
+                    modalMouvement.classList.add("actif");
+                });
+            }
+            
+            if (btnSortie) {
+                btnSortie.addEventListener("click", () => {
+                    modalTitre.textContent = "Sortie de stock";
+                    modalMouvement.classList.add("actif");
+                });
+            }
+            
+            if (btnInventaire) {
+                btnInventaire.addEventListener("click", () => {
+                    modalTitre.textContent = "Inventaire correctif";
+                    modalMouvement.classList.add("actif");
+                });
+            }
+            
+            if (fermerModal) {
+                fermerModal.addEventListener("click", () => {
+                    modalMouvement.classList.remove("actif");
+                });
+            }
+            
+            if (modalMouvement) {
+                modalMouvement.addEventListener("click", (e) => {
+                    if (e.target === modalMouvement) {
+                        modalMouvement.classList.remove("actif");
+                    }
+                });
+            }
+            
+            // Onglets produits
+            document.querySelectorAll(".onglet-btn").forEach(onglet => {
+                onglet.addEventListener("click", () => {
+                    document.querySelectorAll(".onglet-btn").forEach(o => o.classList.remove("actif"));
+                    onglet.classList.add("actif");
+                });
+            });
+            
+            // Filtres historique
+            document.querySelectorAll(".filtre-btn").forEach(filtre => {
+                filtre.addEventListener("click", () => {
+                    document.querySelectorAll(".filtre-btn").forEach(f => f.classList.remove("actif"));
+                    filtre.classList.add("actif");
+                });
+            });
+            
+            // Onglets notifications
+            document.querySelectorAll(".notif-onglet").forEach(onglet => {
+                onglet.addEventListener("click", () => {
+                    document.querySelectorAll(".notif-onglet").forEach(o => o.classList.remove("actif"));
+                    onglet.classList.add("actif");
+                });
+            });
+        });
+    </script>
+</body>
+</html>
