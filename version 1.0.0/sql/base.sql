@@ -469,3 +469,75 @@ with check (
     bucket_id = 'logos-entreprises'
     and owner_id = (select auth.uid()::text)
 );
+
+-- ================================
+-- PARTIE 9 - ENCORE UNE MODIFICATION
+-- ================================
+
+-- =========================================
+-- FONCTION : récupérer le contexte utilisateur complet
+-- =========================================
+
+create or replace function public.recuperer_contexte_utilisateur()
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_utilisateur_id uuid;
+    v_profil public.profils;
+    v_entreprise public.entreprises;
+begin
+    v_utilisateur_id := auth.uid();
+
+    if v_utilisateur_id is null then
+        raise exception 'Utilisateur non connecté';
+    end if;
+
+    select *
+    into v_profil
+    from public.profils
+    where id = v_utilisateur_id;
+
+    if v_profil.entreprise_active_id is not null then
+        select *
+        into v_entreprise
+        from public.entreprises
+        where id = v_profil.entreprise_active_id;
+    end if;
+
+    return json_build_object(
+        'profil', row_to_json(v_profil),
+        'entreprise', row_to_json(v_entreprise)
+    );
+end;
+$$;
+
+-- ================================
+-- PARTIE 10 - ENCORE UNE MODIFICATION
+-- ================================
+
+grant execute on function public.recuperer_contexte_utilisateur()
+to authenticated;
+
+-- ================================
+-- PARTIE 11 - AUTRES AJUSTEMENTS
+-- ================================
+
+drop policy if exists "entreprises_lire_si_membre" on public.entreprises;
+drop policy if exists "entreprises_lire_si_membre_ou_createur" on public.entreprises;
+
+create policy "entreprises_lire_si_membre_ou_createur"
+on public.entreprises
+for select
+to authenticated
+using (
+    cree_par = auth.uid()
+    or exists (
+        select 1
+        from public.membres_entreprise me
+        where me.entreprise_id = entreprises.id
+        and me.utilisateur_id = auth.uid()
+    )
+);
