@@ -1,3 +1,8 @@
+// ==================== SUPABASE ====================
+const URL_SUPABASE = "https://sscfbqidwfzmwfycmpgu.supabase.co";
+const CLE_PUBLIQUE_SUPABASE = "sb_publishable__gqk44RVJvob57geoVDvCw_jwPqFX0n";
+
+const clientSupabase = supabase.createClient(URL_SUPABASE, CLE_PUBLIQUE_SUPABASE);
 
         // ==================== DONNÉES ====================
         const traductions = {
@@ -66,11 +71,43 @@
             { id: 7, type: "faible", titre: "Stock faible", desc: "Détergent 1kg - 12 unités restantes", date: "Il y a 3 jours", lu: true }
         ];
         
-        // ==================== SUPABASE ====================
-const URL_SUPABASE = "https://sscfbqidwfzmwfycmpgu.supabase.co";
-const CLE_PUBLIQUE_SUPABASE = "sb_publishable__gqk44RVJvob57geoVDvCw_jwPqFX0n";
-
-const clientSupabase = supabase.createClient(URL_SUPABASE, CLE_PUBLIQUE_SUPABASE);
+        const donneesRolesEntreprise = {
+            administrateur: {
+                nom: "Administrateur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> dispose d'un accès complet : gestion des membres, paramètres système, autorisations et supervision de l'ensemble de l'activité.`;
+                },
+                actions: ["Tout gérer"]
+            },
+            editeur: {
+                nom: "Éditeur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> peut créer, modifier et supprimer des produits, ainsi qu'enregistrer les entrées, sorties et inventaires.`;
+                },
+                actions: ["Créer", "Modifier", "Supprimer", "Entrée", "Sortie", "Inventaire"]
+            },
+            coordinateur: {
+                nom: "Coordinateur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> supervise les flux de stock en enregistrant les entrées, sorties et en effectuant les corrections d'inventaire.`;
+                },
+                actions: ["Entrée", "Sortie", "Inventaire"]
+            },
+            auditeur: {
+                nom: "Auditeur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> est habilité à vérifier les niveaux de stock et à appliquer les corrections nécessaires via l'inventaire.`;
+                },
+                actions: ["Inventaire"]
+            },
+            operateur: {
+                nom: "Opérateur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> enregistre les mouvements de marchandises : réceptions en entrée et expéditions en sortie.`;
+                },
+                actions: ["Entrée", "Sortie"]
+            }
+        };
 
 // ==================== SESSION / DONNÉES COURANTES ====================
 let sessionActuelle = null;
@@ -82,67 +119,11 @@ let logoEntrepriseFichier = null;
 let logoEntreprisePreviewUrl = null;
 let modeEditionEntreprise = false;
 let logoEntrepriseUrlExistante = null;
-const rolesEntreprise = [
-            {
-                id: 'operateur',
-                nom: 'Opérateur',
-                icone: 'operateur',
-                couleur: '#2563eb',
-                actions: ['Entrée', 'Sortie'],
-                description: 'Gère les flux de marchandises en entrée et sortie de l\'entrepôt.'
-            },
-            {
-                id: 'controleur',
-                nom: 'Contrôleur',
-                icone: 'controleur',
-                couleur: '#d97706',
-                actions: ['Inventaire correctif'],
-                description: 'Effectue les contrôles qualité et les corrections d\'inventaire.'
-            },
-            {
-                id: 'preparateur',
-                nom: 'Préparateur',
-                icone: 'preparateur',
-                couleur: '#059669',
-                actions: ['Entrée', 'Sortie', 'Inventaire correctif'],
-                description: 'Prépare les commandes avec accès complet aux flux et inventaire.'
-            },
-            {
-                id: 'gestionnaire',
-                nom: 'Gestionnaire',
-                icone: 'gestionnaire',
-                couleur: '#7c3aed',
-                actions: ['Entrée', 'Sortie', 'Inventaire', 'Créer produits', 'Modifier produits', 'Supprimer produits'],
-                description: 'Gestion complète du catalogue produits et des opérations logistiques.'
-            },
-            {
-                id: 'administrateur',
-                nom: 'Administrateur',
-                icone: 'administrateur',
-                couleur: '#db2777',
-                actions: ['Tous les droits'],
-                description: 'Contrôle total de l\'application, gestion des utilisateurs et du système.'
-            }
-        ];
-let utilisateursEntreprise = [
-            { id: 1, nom: 'Marie Dupont', email: 'marie.dupont@techcorp.fr', role: 'gestionnaire', avatar: null },
-            { id: 2, nom: 'Jean Martin', email: 'jean.martin@techcorp.fr', role: 'operateur', avatar: null },
-            { id: 3, nom: 'Sophie Bernard', email: 'sophie.bernard@techcorp.fr', role: 'preparateur', avatar: null },
-            { id: 4, nom: 'Pierre Moreau', email: 'pierre.moreau@techcorp.fr', role: 'controleur', avatar: null }
-        ];
-let roleSelectionneEntreprise = null;
-let donneesQREntreprise = null;
-let utilisateurEnEditionEntreprise = null;
+let roleCourantMembreEntreprise = null;
+let roleSelectionneMembreEntreprise = null;
+let membreSelectionneEntreprise = null;
+let instanceQrCodeEntreprise = null;
 
-        // Icônes SVG
-        const iconesEntreprise = {
-            operateur: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
-            controleur: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
-            preparateur: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
-            gestionnaire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-            administrateur: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-            coche: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>'
-        };
         // ==================== ÉTAT ====================
         let ecranActuel = "ecran-langue";
         let slideOnboarding = 0;
@@ -588,6 +569,30 @@ function restaurerEcranSauvegarde() {
             
             conteneur.innerHTML = tableauHTML;
         }
+        
+         // ==================== FONCTIONS UTILITAIRES ENTREPRISE ====================
+        function ouvrirPanneauEntreprise(panneau) {
+            overlayEntreprise.classList.add('actif');
+            panneau.classList.add('actif');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fermerPanneauEntreprise(panneau) {
+            overlayEntreprise.classList.remove('actif');
+            panneau.classList.remove('actif');
+            document.body.style.overflow = '';
+        }
+
+        function fermerTousPanneauxEntreprise() {
+            overlayEntreprise.classList.remove('actif');
+            panneauInvitationEntreprise.classList.remove('actif');
+            panneauProfilEntreprise.classList.remove('actif');
+            document.body.style.overflow = '';
+        }
+
+        function extrairePrenomEntreprise(nomComplet) {
+            return nomComplet.split(' ')[0];
+        }   
         
         // ==================== OUTILS UTILISATEUR ====================
 function obtenirNomUtilisateurDepuisAuth(utilisateur) {
@@ -1412,277 +1417,25 @@ rendreListeChoixEntreprise();
     return true;
 }
 
-function initialiserEntreprise() {
-            afficherUtilisateursEntreprise();
-            afficherRolesEntreprise();
-            chargerInfosEntreprise();
-        }
-
-function chargerInfosEntreprise() {
-            // Récupérer les infos de l'entreprise actuelle si disponible
-            if (typeof entrepriseActuelle !== 'undefined' && entrepriseActuelle) {
-                document.getElementById('entreprise-nom-affichage').textContent = entrepriseActuelle.nom || 'Mon Entreprise';
-                document.getElementById('entreprise-description-affichage').textContent = entrepriseActuelle.description || 'Description de l\'entreprise';
-                document.getElementById('nom-entreprise-qr').textContent = entrepriseActuelle.nom || 'Mon Entreprise';
-                document.getElementById('invitation-qr-entreprise').textContent = 
-                    `${entrepriseActuelle.nom || 'Mon Entreprise'} vous invite à rejoindre l'équipe en tant que`;
-                
-                // Charger le logo si disponible
-                if (entrepriseActuelle.logo) {
-                    const imgLogo = document.getElementById('entreprise-logo-img');
-                    const svgLogo = document.getElementById('entreprise-logo-svg');
-                    imgLogo.src = entrepriseActuelle.logo;
-                    imgLogo.style.display = 'block';
-                    svgLogo.style.display = 'none';
-                }
-            }
-        }
-
-function afficherUtilisateursEntreprise() {
-            const conteneur = document.getElementById('liste-utilisateurs-entreprise');
-            
-            // Ajouter l'administrateur en premier si défini
-            let html = '';
-            
-            // Vérifier si on a un admin à afficher (utilisateurActuel ou autre)
-            if (typeof utilisateurActuel !== 'undefined' && utilisateurActuel) {
-                const initialesAdmin = utilisateurActuel.nom ? 
-                    utilisateurActuel.nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'AD';
-                
-                html += `
-                    <div class="element-utilisateur-entreprise" onclick="ouvrirDetailUtilisateurEntreprise('admin')">
-                        <div class="utilisateur-avatar" id="entreprise-admin-avatar">
-                            <img id="entreprise-admin-avatar-img" alt="Photo de profil administrateur" referrerpolicy="no-referrer" style="display:none;">
-                            <svg id="entreprise-admin-avatar-svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                <circle cx="12" cy="7" r="4"/>
-                            </svg>
-                        </div>
-                        <div class="utilisateur-infos">
-                            <div class="utilisateur-nom" id="entreprise-admin-nom">${utilisateurActuel.nom || 'Administrateur'}</div>
-                            <div class="utilisateur-role" id="entreprise-admin-email">${utilisateurActuel.email || 'email@example.com'}</div>
-                        </div>
-                        <span class="badge-admin">Admin</span>
-                    </div>
-                `;
-                
-                // Mettre à jour l'avatar admin si disponible
-                setTimeout(() => {
-                    if (utilisateurActuel.photoURL) {
-                        const imgAdmin = document.getElementById('entreprise-admin-avatar-img');
-                        const svgAdmin = document.getElementById('entreprise-admin-avatar-svg');
-                        if (imgAdmin && svgAdmin) {
-                            imgAdmin.src = utilisateurActuel.photoURL;
-                            imgAdmin.style.display = 'block';
-                            svgAdmin.style.display = 'none';
-                        }
-                    }
-                }, 0);
-            }
-            
-            // Ajouter les autres utilisateurs
-            html += utilisateursEntreprise.map(utilisateur => {
-                const role = rolesEntreprise.find(r => r.id === utilisateur.role);
-                const initiales = utilisateur.nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                return `
-                    <div class="element-utilisateur-entreprise" onclick="ouvrirDetailUtilisateurEntreprise(${utilisateur.id})">
-                        <div class="utilisateur-avatar">${initiales}</div>
-                        <div class="utilisateur-infos">
-                            <div class="utilisateur-nom">${utilisateur.nom}</div>
-                            <div class="utilisateur-email">${utilisateur.email}</div>
-                        </div>
-                        <div class="badge-admin" style="background: ${role ? role.couleur + '20' : 'var(--fond-tertiaire)'}; color: ${role ? role.couleur : 'var(--texte-secondaire)'};">
-                            ${role ? role.nom : utilisateur.role}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            conteneur.innerHTML = html;
-        }
-
-function afficherRolesEntreprise() {
-            const conteneur = document.getElementById('liste-roles-entreprise');
-            conteneur.innerHTML = rolesEntreprise.map(role => `
-                <div class="carte-role-entreprise" onclick="selectionnerRoleEntreprise('${role.id}')">
-                    <div class="entete-role-entreprise">
-                        <div class="icone-role-entreprise ${role.icone}">
-                            ${iconesEntreprise[role.icone]}
-                        </div>
-                        <span class="nom-role-entreprise">${role.nom}</span>
-                    </div>
-                    <div class="actions-role-entreprise">
-                        ${role.actions.map(action => `
-                            <span class="etiquette-action-entreprise">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
-                                ${action}
-                            </span>
-                        `).join('')}
-                    </div>
-                    <p class="description-role-entreprise">${role.description}</p>
-                </div>
-            `).join('');
-        }
-
-        // Feuille ajout utilisateur
-function ouvrirAjoutUtilisateurEntreprise() {
-            document.getElementById('overlay-ajout-utilisateur-entreprise').classList.add('actif');
-            document.getElementById('feuille-ajout-utilisateur-entreprise').classList.add('actif');
-        }
-
-function fermerAjoutUtilisateurEntreprise() {
-            document.getElementById('overlay-ajout-utilisateur-entreprise').classList.remove('actif');
-            document.getElementById('feuille-ajout-utilisateur-entreprise').classList.remove('actif');
-        }
-
-function selectionnerRoleEntreprise(idRole) {
-            roleSelectionneEntreprise = rolesEntreprise.find(r => r.id === idRole);
-            fermerAjoutUtilisateurEntreprise();
-            genererQREntreprise();
-        }
-
-        // QR Code
-        function genererQREntreprise() {
-            const conteneurQR = document.getElementById('qrcode-entreprise');
-            conteneurQR.innerHTML = '';
-            
-            const nomEntreprise = (typeof entrepriseActuelle !== 'undefined' && entrepriseActuelle?.nom) ? 
-                entrepriseActuelle.nom : 'Mon Entreprise';
-            
-            donneesQREntreprise = JSON.stringify({
-                entreprise: nomEntreprise,
-                role: roleSelectionneEntreprise.id,
-                horodatage: Date.now()
+function mettreAJourTagsRolesEntreprise(roleActifEntreprise) {
+            document.querySelectorAll('[data-tag-role-entreprise]').forEach(tag => {
+                tag.classList.toggle('selectionne-entreprise', tag.getAttribute('data-tag-role-entreprise') === roleActifEntreprise);
             });
-
-            new QRCode(conteneurQR, {
-                text: donneesQREntreprise,
-                width: 200,
-                height: 200,
-                colorDark: '#111827',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.M
-            });
-
-            document.getElementById('nom-role-qr-entreprise').textContent = roleSelectionneEntreprise.nom;
-            document.getElementById('qr-plein-ecran-entreprise').classList.add('actif');
         }
-
-        function fermerQREntreprise() {
-            document.getElementById('qr-plein-ecran-entreprise').classList.remove('actif');
-            roleSelectionneEntreprise = null;
-        }
-
-        function exporterQREntreprise() {
-            const canvas = document.querySelector('#qrcode-entreprise canvas');
-            if (canvas) {
-                const lien = document.createElement('a');
-                lien.download = `invitation-${roleSelectionneEntreprise.id}-${(typeof entrepriseActuelle !== 'undefined' && entrepriseActuelle?.nom) ? entrepriseActuelle.nom.toLowerCase().replace(/\s+/g, '-') : 'entreprise'}.png`;
-                lien.href = canvas.toDataURL('image/png');
-                lien.click();
+        
+function mettreAJourDescriptionRoleEntreprise(nomCompletEntreprise, roleEntreprise) {
+            const prenomEntreprise = extrairePrenomEntreprise(nomCompletEntreprise);
+            const descriptionEntreprise = donneesRolesEntreprise[roleEntreprise];
+            if (descriptionEntreprise) {
+                document.getElementById('description-role-panneau-entreprise').innerHTML = descriptionEntreprise.description(prenomEntreprise);
             }
         }
 
-        // Détail utilisateur
-        function ouvrirDetailUtilisateurEntreprise(idUtilisateur) {
-            if (idUtilisateur === 'admin') {
-                // Gérer l'affichage de l'admin
-                utilisateurEnEditionEntreprise = {
-                    id: 'admin',
-                    nom: (typeof utilisateurActuel !== 'undefined' && utilisateurActuel?.nom) ? utilisateurActuel.nom : 'Administrateur',
-                    email: (typeof utilisateurActuel !== 'undefined' && utilisateurActuel?.email) ? utilisateurActuel.email : 'email@example.com',
-                    role: 'administrateur'
-                };
-            } else {
-                utilisateurEnEditionEntreprise = utilisateursEntreprise.find(u => u.id === idUtilisateur);
-            }
-            
-            const roleActuel = rolesEntreprise.find(r => r.id === utilisateurEnEditionEntreprise.role);
-            
-            const contenu = document.getElementById('contenu-detail-utilisateur-entreprise');
-            const initiales = utilisateurEnEditionEntreprise.nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            
-            contenu.innerHTML = `
-                <div class="entete-detail-utilisateur-entreprise">
-                    <div class="avatar-detail-utilisateur-entreprise">${initiales}</div>
-                    <div class="infos-detail-utilisateur-entreprise">
-                        <div class="nom-detail-utilisateur-entreprise">${utilisateurEnEditionEntreprise.nom}</div>
-                        <div class="email-detail-utilisateur-entreprise">${utilisateurEnEditionEntreprise.email}</div>
-                    </div>
-                </div>
-                <h4 class="titre-feuille-entreprise" style="font-size: 0.875rem; color: var(--texte-secondaire); margin-bottom: 12px;">Modifier le rôle</h4>
-                <div class="selecteur-role-entreprise">
-                    ${rolesEntreprise.map(role => `
-                        <div class="option-role-entreprise ${role.id === utilisateurEnEditionEntreprise.role ? 'selectionne' : ''}" onclick="changerRoleUtilisateurEntreprise('${role.id}')">
-                            <div class="icone-option-role-entreprise ${role.icone}">
-                                ${iconesEntreprise[role.icone]}
-                            </div>
-                            <div class="infos-option-role-entreprise">
-                                <div class="nom-option-role-entreprise">${role.nom}</div>
-                                <div class="desc-option-role-entreprise">${role.actions.slice(0, 3).join(' • ')}${role.actions.length > 3 ? '...' : ''}</div>
-                            </div>
-                            <div class="coche-option-role-entreprise">
-                                ${iconesEntreprise.coche}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="actions-feuille-entreprise">
-                    <button class="btn-primaire-entreprise" onclick="sauvegarderModificationsUtilisateurEntreprise()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
-                        Appliquer les modifications
-                    </button>
-                    ${idUtilisateur !== 'admin' ? `
-                    <button class="btn-danger-entreprise" onclick="retirerUtilisateurEntreprise()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        Retirer l'utilisateur
-                    </button>
-                    ` : ''}
-                </div>
-            `;
-            
-            document.getElementById('overlay-detail-utilisateur-entreprise').classList.add('actif');
-            document.getElementById('feuille-detail-utilisateur-entreprise').classList.add('actif');
+function mettreAJourCompteurEntreprise() {
+            const totalEntreprise = document.querySelectorAll('.membre-entreprise').length;
+            document.getElementById('compteur-utilisateurs-entreprise').textContent = totalEntreprise;
         }
-
-        function fermerDetailUtilisateurEntreprise() {
-            document.getElementById('overlay-detail-utilisateur-entreprise').classList.remove('actif');
-            document.getElementById('feuille-detail-utilisateur-entreprise').classList.remove('actif');
-            utilisateurEnEditionEntreprise = null;
-        }
-
-        function changerRoleUtilisateurEntreprise(idRole) {
-            document.querySelectorAll('.option-role-entreprise').forEach(el => el.classList.remove('selectionne'));
-            event.currentTarget.classList.add('selectionne');
-            utilisateurEnEditionEntreprise.nouveauRole = idRole;
-        }
-
-        function sauvegarderModificationsUtilisateurEntreprise() {
-            if (utilisateurEnEditionEntreprise.nouveauRole) {
-                if (utilisateurEnEditionEntreprise.id === 'admin') {
-                    // Mettre à jour le rôle de l'admin si nécessaire
-                    if (typeof utilisateurActuel !== 'undefined') {
-                        utilisateurActuel.role = utilisateurEnEditionEntreprise.nouveauRole;
-                    }
-                } else {
-                    utilisateurEnEditionEntreprise.role = utilisateurEnEditionEntreprise.nouveauRole;
-                }
-                delete utilisateurEnEditionEntreprise.nouveauRole;
-                afficherUtilisateursEntreprise();
-            }
-            fermerDetailUtilisateurEntreprise();
-        }
-
-        function retirerUtilisateurEntreprise() {
-            if (utilisateurEnEditionEntreprise.id !== 'admin') {
-                const index = utilisateursEntreprise.findIndex(u => u.id === utilisateurEnEditionEntreprise.id);
-                if (index > -1) {
-                    utilisateursEntreprise.splice(index, 1);
-                    afficherUtilisateursEntreprise();
-                }
-            }
-            fermerDetailUtilisateurEntreprise();
-        }
+        
 // ==================== AFFICHAGE INTERFACE ====================
 function eclaircirCouleur(hex, pourcentage = 20) {
     if (!hex || !hex.startsWith("#")) return hex;
@@ -1845,9 +1598,13 @@ async function verifierRedirectionUtilisateur() {
 }
 
         // ==================== ÉVÉNEMENTS ====================
+        const overlayEntreprise = document.getElementById('overlay-entreprise');
+const panneauInvitationEntreprise = document.getElementById('panneau-invitation-entreprise');
+const panneauProfilEntreprise = document.getElementById('panneau-profil-utilisateur-entreprise');
+const qrPleinEcranEntreprise = document.getElementById('qr-plein-ecran-entreprise');
+
         document.addEventListener("DOMContentLoaded", () => {
           verifierRedirectionUtilisateur();
-          initialiserEntreprise();
             // Langue
             document.querySelectorAll(".langue-btn").forEach(btn => {
                 btn.addEventListener("click", () => {
@@ -1882,20 +1639,6 @@ async function verifierRedirectionUtilisateur() {
                     setTimeout(() => afficherEcran("ecran-onboarding"), 300);
                 });
             });
-            
-            document.getElementById('btn-ajouter-utilisateur-entreprise').addEventListener('click', ouvrirAjoutUtilisateurEntreprise);
-            document.getElementById('overlay-ajout-utilisateur-entreprise').addEventListener('click', fermerAjoutUtilisateurEntreprise);
-            document.getElementById('overlay-detail-utilisateur-entreprise').addEventListener('click', fermerDetailUtilisateurEntreprise);
-            document.getElementById('btn-fermer-qr-entreprise').addEventListener('click', fermerQREntreprise);
-            document.getElementById('btn-exporter-qr-entreprise').addEventListener('click', exporterQREntreprise);
-            
-            const interrupteurVerrou = document.getElementById('interrupteur-verrou-entreprise');
-            if (interrupteurVerrou) {
-                interrupteurVerrou.addEventListener('change', (e) => {
-                    // Gérer le verrouillage - à adapter selon ton système
-                    console.log('Verrouillage:', e.target.checked);
-                });
-            }
             
             // Onboarding
             const btnSuivant = document.getElementById("btn-onboarding-suivant");
@@ -2122,8 +1865,90 @@ if (zoneLogoUpload && inputLogoEntreprise) {
                     afficherEcran("ecran-entreprise");
                 });
             }
+
+
+
+document.getElementById('btn-ajouter-utilisateur-entreprise').addEventListener('click', () => {
+            ouvrirPanneauEntreprise(panneauInvitationEntreprise);
+        });
+        
+document.querySelectorAll('[data-role-invitation-entreprise]').forEach(carte => {
+            carte.addEventListener('click', () => {
+                const roleEntreprise = carte.getAttribute('data-role-invitation-entreprise');
+                const infosRoleEntreprise = donneesRolesEntreprise[roleEntreprise];
+
+                fermerPanneauEntreprise(panneauInvitationEntreprise);
+
+                // Mettre à jour le QR
+                const nomEntrepriseEntreprise = document.getElementById('nom-entreprise-affichage').textContent;
+                document.getElementById('invitation-qr-entreprise').textContent =
+                    `${nomEntrepriseEntreprise} vous invite à rejoindre l'équipe en tant que`;
+                document.getElementById('nom-entreprise-qr').textContent = nomEntrepriseEntreprise;
+                document.getElementById('nom-role-qr-entreprise').textContent = infosRoleEntreprise.nom;
+
+                // Générer le QR code
+                const conteneurQrEntreprise = document.getElementById('qrcode-entreprise');
+                conteneurQrEntreprise.innerHTML = '';
+
+                const donneeQrEntreprise = JSON.stringify({
+                    type: 'invitation',
+                    entreprise: nomEntrepriseEntreprise,
+                    role: roleEntreprise,
+                    date: new Date().toISOString()
+                });
+
+                if (typeof QRCode !== 'undefined') {
+                    instanceQrCodeEntreprise = new QRCode(conteneurQrEntreprise, {
+                        text: donneeQrEntreprise,
+                        width: 200,
+                        height: 200,
+                        colorDark: "#1a1a2e",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } else {
+                    conteneurQrEntreprise.innerHTML = '<div style="width:200px;height:200px;background:var(--fond-tertiaire);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--texte-secondaire);font-size:0.75rem;">QR Code</div>';
+                }
+
+                setTimeout(() => {
+                    qrPleinEcranEntreprise.classList.add('actif');
+                }, 280);
+            });
+        });
+        
+document.getElementById('btn-fermer-qr-entreprise').addEventListener('click', () => {
+            qrPleinEcranEntreprise.classList.remove('actif');
+        });
+        
+document.querySelectorAll('.membre-entreprise').forEach(membre => {
+            membre.addEventListener('click', () => {
+                const nomEntreprise = membre.getAttribute('data-nom-entreprise');
+                const emailEntreprise = membre.getAttribute('data-email-entreprise');
+                const roleEntreprise = membre.getAttribute('data-role-entreprise');
+
+                membreSelectionneEntreprise = { nom: nomEntreprise, email: emailEntreprise, role: roleEntreprise };
+                roleCourantMembreEntreprise = roleEntreprise;
+                roleSelectionneMembreEntreprise = roleEntreprise;
+
+                // Remplir le profil
+                document.getElementById('nom-panneau-entreprise').textContent = nomEntreprise;
+                document.getElementById('email-panneau-entreprise').textContent = emailEntreprise;
+
+                // Sélectionner le bon tag
+                mettreAJourTagsRolesEntreprise(roleEntreprise);
+
+                // Description
+                mettreAJourDescriptionRoleEntreprise(nomEntreprise, roleEntreprise);
+
+                // Bouton modifier désactivé par défaut
+                const btnModifierEntreprise = document.getElementById('btn-modifier-role-entreprise');
+                btnModifierEntreprise.disabled = true;
+
+                ouvrirPanneauEntreprise(panneauProfilEntreprise);
+            });
+        });
             
-            const ouvrirEditionEntreprise = document.getElementById("ouvrir-edition-entreprise");
+const ouvrirEditionEntreprise = document.getElementById("ouvrir-edition-entreprise");
 if (ouvrirEditionEntreprise) {
     ouvrirEditionEntreprise.addEventListener("click", () => {
         preRemplirFormulaireEntreprisePourEdition();
@@ -2131,22 +1956,80 @@ if (ouvrirEditionEntreprise) {
     });
 }
 
-const btnChangerEntreprise = document.getElementById("ouvrir-changer-entreprise");
+document.querySelectorAll('[data-tag-role-entreprise]').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const nouveauRoleEntreprise = tag.getAttribute('data-tag-role-entreprise');
+                roleSelectionneMembreEntreprise = nouveauRoleEntreprise;
 
-if (btnChangerEntreprise) {
-    btnChangerEntreprise.addEventListener("click", async () => {
-        console.log("Changement d'entreprise demandé");
+                mettreAJourTagsRolesEntreprise(nouveauRoleEntreprise);
 
-        // Recharger les entreprises pour être sûr que c'est à jour
-        await chargerEntreprisesUtilisateur();
+                if (membreSelectionneEntreprise) {
+                    mettreAJourDescriptionRoleEntreprise(membreSelectionneEntreprise.nom, nouveauRoleEntreprise);
+                }
 
-        // Rafraîchir la liste affichée
-        rendreListeChoixEntreprise();
+                // Activer/désactiver le bouton modifier
+                const btnModifierEntreprise = document.getElementById('btn-modifier-role-entreprise');
+                btnModifierEntreprise.disabled = (nouveauRoleEntreprise === roleCourantMembreEntreprise);
+            });
+        });  
+        
+document.getElementById('btn-modifier-role-entreprise').addEventListener('click', () => {
+            if (membreSelectionneEntreprise && roleSelectionneMembreEntreprise !== roleCourantMembreEntreprise) {
+                const ancienRoleEntreprise = donneesRolesEntreprise[roleCourantMembreEntreprise].nom;
+                const nouveauRoleEntreprise = donneesRolesEntreprise[roleSelectionneMembreEntreprise].nom;
 
-        // Aller à l'écran choix entreprise
-        afficherEcran("ecran-choix-entreprise");
-    });
-}
+                alert(`Rôle de ${membreSelectionneEntreprise.nom} modifié : ${ancienRoleEntreprise} → ${nouveauRoleEntreprise}`);
+
+                fermerPanneauEntreprise(panneauProfilEntreprise);
+            }
+        });
+        
+document.getElementById('btn-retirer-membre-entreprise').addEventListener('click', () => {
+            if (membreSelectionneEntreprise) {
+                if (confirm(`Retirer ${membreSelectionneEntreprise.nom} de l'équipe ?`)) {
+                    alert(`${membreSelectionneEntreprise.nom} a été retiré de l'équipe.`);
+                    fermerPanneauEntreprise(panneauProfilEntreprise);
+                }
+            }
+        });
+        
+      overlayEntreprise.addEventListener('click', fermerTousPanneauxEntreprise);
+      
+  document.getElementById('verrou-entreprise').addEventListener('change', function() {
+            if (this.checked) {
+                alert("L'entreprise est verrouillée. Seuls les administrateurs conservent l'accès.");
+            } else {
+                alert("L'entreprise est déverrouillée. Tous les membres retrouvent leur accès.");
+            }
+        });
+        
+  document.getElementById('btn-quitter-entreprise').addEventListener('click', () => {
+            if (confirm("Êtes-vous sûr de vouloir quitter cette entreprise ? Cette action est irréversible.")) {
+                alert("Vous avez quitté l'entreprise.");
+            }
+        });
+        
+document.getElementById('btn-exporter-qr-entreprise').addEventListener('click', () => {
+            const canvasEntreprise = document.querySelector('#qrcode-entreprise canvas');
+            const imgEntreprise = document.querySelector('#qrcode-entreprise img');
+
+            let urlDonneeEntreprise = null;
+
+            if (canvasEntreprise) {
+                urlDonneeEntreprise = canvasEntreprise.toDataURL('image/png');
+            } else if (imgEntreprise) {
+                urlDonneeEntreprise = imgEntreprise.src;
+            }
+
+            if (urlDonneeEntreprise) {
+                const lienEntreprise = document.createElement('a');
+                lienEntreprise.download = 'invitation-qr-entreprise.png';
+                lienEntreprise.href = urlDonneeEntreprise;
+                lienEntreprise.click();
+            } else {
+                alert("Aucun QR code à exporter.");
+            }
+        });
             
             // Toggle mode depuis menu
             const toggleMode = document.getElementById("toggle-mode");
