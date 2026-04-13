@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entreprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fond: #f8f9fa;
+            --fond-secondaire: #ffffff;
+            --fond-tertiaire: #e9ecef;
+            --texte: #1a1a2e;
+            --texte-secondaire: #6c757d;
+            --texte-tertiaire: #adb5bd;
+            --bordure: #dee2e6;
+            --accent: #2d3436;
+            --accent-clair: #636e72;
+            --succes: #00b894;
+            --attention: #fdcb6e;
+            --danger: #e17055;
+            --info: #0984e3;
+            --ombre: 0 2px 8px rgba(0,0,0,0.08);
+            --ombre-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --rayon: 12px;
+            --rayon-sm: 8px;
+        }
+
+        [data-mode="sombre"] {
+            --fond: #0d1117;
+            --fond-secondaire: #161b22;
+            --fond-tertiaire: #21262d;
+            --texte: #e6edf3;
+            --texte-secondaire: #8b949e;
+            --texte-tertiaire: #484f58;
+            --bordure: #30363d;
+            --accent: #58a6ff;
+            --accent-clair: #8b949e;
+            --ombre: 0 2px 8px rgba(0,0,0,0.3);
+            --ombre-lg: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--fond);
+            color: var(--texte);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .ecran {
+            display: none;
+            min-height: 100vh;
+            animation: fonduInEntreprise 0.4s ease-out;
+        }
+
+        .ecran.actif {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fonduInEntreprise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== ENTÊTE ===== */
+        .entete-formulaire {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--fond-secondaire);
+            border-bottom: 1px solid var(--bordure);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .btn-retour {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--texte);
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .btn-retour:active {
+            background: var(--fond-tertiaire);
+        }
+
+        .btn-retour svg {
+            width: 22px;
+            height: 22px;
+            stroke: currentColor;
+        }
+
+        .entete-titre {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        /* ===== CONTENU DÉFILABLE ===== */
+        .contenu-entreprise {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 32px;
+        }
+
+        /* ===== PROFIL ENTREPRISE ===== */
+        .profil-entreprise {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 20px 20px;
+            background: var(--fond-secondaire);
+            position: relative;
+        }
+
+        .logo-entreprise {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: var(--fond-tertiaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 14px;
+            border: 2px solid var(--bordure);
+        }
+
+        .logo-entreprise-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .logo-entreprise svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--texte-secondaire);
+        }
+
+        .nom-entreprise {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .description-entreprise {
+            font-size: 0.8125rem;
+            color: var(--texte-secondaire);
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        .btn-editer-entreprise {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--fond-tertiaire);
+            border: none;
+            border-radius: 50%;
+            color: var(--texte-secondaire);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-editer-entreprise:active {
+            transform: scale(0.93);
+        }
+
+        .btn-editer-entreprise svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* ===== SECTION UTILISATEURS ===== */
+        .section-utilisateurs-entreprise {
+            margin-top: 8px;
+        }
+
+        .entete-utilisateurs-entreprise {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 10px;
+        }
+
+        .titre-utilisateurs-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+        }
+
+        .titre-utilisateurs-entreprise svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--texte-secondaire);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .compteur-utilisateurs-entreprise {
+            font-size: 0.75rem;
+            color: var(--texte-secondaire);
+            background: var(--fond-tertiaire);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .btn-ajouter-utilisateur-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border: none;
+            border-radius: var(--rayon-sm);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ajouter-utilisateur-entreprise:active {
+            transform: scale(0.96);
+        }
+
+        .btn-ajouter-utilisateur-entreprise svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* ===== GROUPE RÔLE (SECTIONS HIÉRARCHIQUES) ===== */
+        .groupe-role-entreprise {
+            margin-top: 4px;
+        }
+
+        .etiquette-groupe-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px 6px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--texte-tertiaire);
+        }
+
+        .etiquette-groupe-entreprise svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .liste-membres-entreprise {
+            background: var(--fond-secondaire);
+            border-top: 1px solid var(--bordure);
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .membre-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+
+        .membre-entreprise:active {
+            background: var(--fond-tertiaire);
+        }
+
+        .membre-entreprise + .membre-entreprise::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 64px;
+            right: 20px;
+            height: 1px;
+            background: var(--bordure);
+        }
+
+        .avatar-membre-entreprise {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--fond-tertiaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar-membre-entreprise img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-membre-entreprise svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--texte-tertiaire);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .infos-membre-entreprise {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .nom-membre-entreprise {
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-membre-entreprise {
+            font-size: 0.75rem;
+            color: var(--texte-secondaire);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chevron-membre-entreprise {
+            width: 16px;
+            height: 16px;
+            stroke: var(--texte-tertiaire);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        /* ===== ZONE ACTIONS BAS ===== */
+        .zone-actions-entreprise {
+            margin-top: 24px;
+            padding: 0 20px;
+        }
+
+        .titre-zone-actions-entreprise {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--texte-tertiaire);
+            padding: 0 0 8px;
+        }
+
+        .carte-actions-entreprise {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon);
+            border: 1px solid var(--bordure);
+            overflow: hidden;
+        }
+
+        .action-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            color: var(--texte);
+        }
+
+        .action-entreprise:active {
+            background: var(--fond-tertiaire);
+        }
+
+        .action-entreprise + .action-entreprise {
+            border-top: 1px solid var(--bordure);
+        }
+
+        .icone-action-entreprise {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icone-action-entreprise svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .icone-action-entreprise.verrouiller-entreprise {
+            background: rgba(253, 203, 110, 0.15);
+        }
+
+        .icone-action-entreprise.verrouiller-entreprise svg {
+            stroke: var(--attention);
+        }
+
+        .icone-action-entreprise.changer-entreprise {
+            background: rgba(9, 132, 227, 0.12);
+        }
+
+        .icone-action-entreprise.changer-entreprise svg {
+            stroke: var(--info);
+        }
+
+        .icone-action-entreprise.quitter-entreprise {
+            background: rgba(225, 112, 85, 0.12);
+        }
+
+        .icone-action-entreprise.quitter-entreprise svg {
+            stroke: var(--danger);
+        }
+
+        .texte-action-entreprise {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .label-action-entreprise {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .desc-action-entreprise {
+            font-size: 0.6875rem;
+            color: var(--texte-secondaire);
+            line-height: 1.4;
+            margin-top: 1px;
+        }
+
+        .interrupteur-entreprise {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .interrupteur-entreprise input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .curseur-entreprise {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--fond-tertiaire);
+            border-radius: 26px;
+            transition: 0.25s;
+        }
+
+        .curseur-entreprise::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--fond-secondaire);
+            border-radius: 50%;
+            transition: 0.25s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .interrupteur-entreprise input:checked + .curseur-entreprise {
+            background: var(--attention);
+        }
+
+        .interrupteur-entreprise input:checked + .curseur-entreprise::before {
+            transform: translateX(20px);
+        }
+
+        .chevron-action-entreprise {
+            width: 16px;
+            height: 16px;
+            stroke: var(--texte-tertiaire);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        .label-quitter-entreprise {
+            color: var(--danger);
+        }
+
+        /* ===== OVERLAY BOTTOM-SHEET ===== */
+        .overlay-entreprise {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+        }
+
+        .overlay-entreprise.actif {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== BOTTOM-SHEET BASE ===== */
+        .panneau-entreprise {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--fond-secondaire);
+            border-radius: 20px 20px 0 0;
+            z-index: 60;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panneau-entreprise.actif {
+            transform: translateY(0);
+        }
+
+        .poignee-panneau-entreprise {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0 4px;
+            flex-shrink: 0;
+        }
+
+        .poignee-panneau-entreprise span {
+            width: 36px;
+            height: 4px;
+            border-radius: 4px;
+            background: var(--bordure);
+        }
+
+        .entete-panneau-entreprise {
+            padding: 8px 20px 14px;
+            flex-shrink: 0;
+        }
+
+        .titre-panneau-entreprise {
+            font-size: 1.0625rem;
+            font-weight: 700;
+        }
+
+        .sous-titre-panneau-entreprise {
+            font-size: 0.75rem;
+            color: var(--texte-secondaire);
+            margin-top: 2px;
+        }
+
+        .corps-panneau-entreprise {
+            padding: 0 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* ===== BOTTOM-SHEET : CHOIX RÔLE (INVITATION) ===== */
+        .carte-role-entreprise {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px;
+            border-radius: var(--rayon);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1.5px solid var(--bordure);
+            margin-bottom: 8px;
+            background: var(--fond-secondaire);
+        }
+
+        .carte-role-entreprise:active {
+            transform: scale(0.98);
+        }
+
+        .carte-role-entreprise:hover {
+            border-color: var(--accent);
+        }
+
+        .icone-role-entreprise {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icone-role-entreprise svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .icone-role-entreprise.role-administrateur-entreprise {
+            background: rgba(225, 112, 85, 0.12);
+        }
+        .icone-role-entreprise.role-administrateur-entreprise svg { stroke: var(--danger); }
+
+        .icone-role-entreprise.role-editeur-entreprise {
+            background: rgba(9, 132, 227, 0.12);
+        }
+        .icone-role-entreprise.role-editeur-entreprise svg { stroke: var(--info); }
+
+        .icone-role-entreprise.role-coordinateur-entreprise {
+            background: rgba(0, 184, 148, 0.12);
+        }
+        .icone-role-entreprise.role-coordinateur-entreprise svg { stroke: var(--succes); }
+
+        .icone-role-entreprise.role-auditeur-entreprise {
+            background: rgba(253, 203, 110, 0.15);
+        }
+        .icone-role-entreprise.role-auditeur-entreprise svg { stroke: #e67e22; }
+
+        .icone-role-entreprise.role-operateur-entreprise {
+            background: rgba(108, 117, 125, 0.12);
+        }
+        .icone-role-entreprise.role-operateur-entreprise svg { stroke: var(--texte-secondaire); }
+
+        .details-role-entreprise {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .nom-role-entreprise {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .desc-role-entreprise {
+            font-size: 0.6875rem;
+            color: var(--texte-secondaire);
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .tags-role-entreprise {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .tag-action-entreprise {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 3px 8px;
+            background: var(--fond-tertiaire);
+            border-radius: 20px;
+            font-size: 0.625rem;
+            font-weight: 500;
+            color: var(--texte-secondaire);
+            white-space: nowrap;
+        }
+
+        .tag-action-entreprise svg {
+            width: 10px;
+            height: 10px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .fleche-role-entreprise {
+            width: 16px;
+            height: 16px;
+            stroke: var(--texte-tertiaire);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+            margin-top: 12px;
+        }
+
+        /* ===== BOTTOM-SHEET : PROFIL UTILISATEUR ===== */
+        .profil-panneau-entreprise {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 18px;
+        }
+
+        .avatar-profil-panneau-entreprise {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--fond-tertiaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .avatar-profil-panneau-entreprise img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-profil-panneau-entreprise svg {
+            width: 26px;
+            height: 26px;
+            stroke: var(--texte-tertiaire);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .nom-profil-panneau-entreprise {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .email-profil-panneau-entreprise {
+            font-size: 0.75rem;
+            color: var(--texte-secondaire);
+        }
+
+        /* Zone tags rôles dans le profil */
+        .zone-roles-panneau-entreprise {
+            padding: 14px 0;
+        }
+
+        .label-roles-panneau-entreprise {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--texte-tertiaire);
+            margin-bottom: 10px;
+        }
+
+        .tags-roles-panneau-entreprise {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-role-panneau-entreprise {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid var(--bordure);
+            background: var(--fond-secondaire);
+            color: var(--texte-secondaire);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .tag-role-panneau-entreprise svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .tag-role-panneau-entreprise.selectionne-entreprise {
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border-color: var(--accent);
+        }
+
+        .tag-role-panneau-entreprise.selectionne-entreprise svg {
+            stroke: var(--fond-secondaire);
+        }
+
+        /* Description du rôle sélectionné */
+        .description-role-panneau-entreprise {
+            background: var(--fond-tertiaire);
+            border-radius: var(--rayon-sm);
+            padding: 12px 14px;
+            margin-top: 12px;
+            font-size: 0.8125rem;
+            color: var(--texte-secondaire);
+            line-height: 1.55;
+            transition: all 0.2s;
+        }
+
+        .description-role-panneau-entreprise strong {
+            color: var(--texte);
+            font-weight: 600;
+        }
+
+        /* Boutons bas du profil */
+        .actions-profil-panneau-entreprise {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid var(--bordure);
+            margin-top: 16px;
+        }
+
+        .btn-modifier-role-entreprise {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: var(--rayon-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-modifier-role-entreprise:disabled {
+            background: var(--fond-tertiaire);
+            color: var(--texte-tertiaire);
+            cursor: not-allowed;
+        }
+
+        .btn-modifier-role-entreprise svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .btn-retirer-membre-entreprise {
+            width: 100%;
+            padding: 13px;
+            border: 1.5px solid var(--danger);
+            border-radius: var(--rayon-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            background: none;
+            color: var(--danger);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-retirer-membre-entreprise:active {
+            background: rgba(225,112,85,0.08);
+        }
+
+        .btn-retirer-membre-entreprise svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* ===== QR PLEIN ÉCRAN ===== */
+        .qr-plein-ecran-entreprise {
+            position: fixed;
+            inset: 0;
+            background: var(--texte);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+        }
+
+        .qr-plein-ecran-entreprise.actif {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .entete-qr-entreprise {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+        }
+
+        .btn-fermer-qr-entreprise {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: var(--fond-secondaire);
+            cursor: pointer;
+        }
+
+        .btn-fermer-qr-entreprise svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        .btn-exporter-qr-entreprise {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: var(--fond-secondaire);
+            border: none;
+            border-radius: var(--rayon-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .btn-exporter-qr-entreprise svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        .contenu-qr-entreprise {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .invitation-qr-entreprise {
+            color: var(--texte-secondaire);
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+            max-width: 280px;
+        }
+
+        .carte-qr-entreprise {
+            background: var(--fond-secondaire);
+            border-radius: var(--rayon);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        #qrcode-entreprise {
+            display: flex;
+            justify-content: center;
+        }
+
+        #qrcode-entreprise img,
+        #qrcode-entreprise canvas {
+            border-radius: var(--rayon-sm);
+        }
+
+        .infos-qr-entreprise {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--bordure);
+        }
+
+        .nom-entreprise-qr {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--texte);
+            margin-bottom: 4px;
+        }
+
+        .role-qr-entreprise {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.8125rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .role-qr-entreprise svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        .instructions-qr-entreprise {
+            color: var(--texte-secondaire);
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            max-width: 320px;
+        }
+
+        .instructions-qr-entreprise strong {
+            color: var(--fond-secondaire);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 768px) {
+            body {
+                display: flex;
+                justify-content: center;
+                background: var(--fond-tertiaire);
+            }
+
+            .ecran {
+                max-width: 420px;
+                background: var(--fond);
+                box-shadow: var(--ombre-lg);
+            }
+
+            .panneau-entreprise {
+                max-width: 420px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100%);
+            }
+
+            .panneau-entreprise.actif {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ÉCRAN ENTREPRISE ===== -->
+    <div class="ecran ecran-entreprise actif" id="ecran-entreprise">
+
+        <!-- Entête -->
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-menu-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Entreprise</h2>
+        </div>
+
+        <!-- Contenu défilable -->
+        <div class="contenu-entreprise">
+
+            <!-- Profil Entreprise -->
+            <div class="profil-entreprise">
+                <button class="btn-editer-entreprise" id="ouvrir-edition-entreprise" title="Modifier les informations">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                        <path d="m15 5 4 4"/>
+                    </svg>
+                </button>
+                <div class="logo-entreprise">
+                    <img id="entreprise-logo-img" class="logo-entreprise-image" alt="Logo entreprise">
+                    <svg id="entreprise-logo-svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                        <path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/>
+                    </svg>
+                </div>
+                <h2 class="nom-entreprise" id="nom-entreprise-affichage">Mon Entreprise</h2>
+                <p class="description-entreprise" id="description-entreprise-affichage">Commerce de gros et détail de produits alimentaires</p>
+            </div>
+
+            <!-- Section Utilisateurs -->
+            <div class="section-utilisateurs-entreprise">
+                <div class="entete-utilisateurs-entreprise">
+                    <div class="titre-utilisateurs-entreprise">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span>Équipe</span>
+                        <span class="compteur-utilisateurs-entreprise" id="compteur-utilisateurs-entreprise">8</span>
+                    </div>
+                    <button class="btn-ajouter-utilisateur-entreprise" id="btn-ajouter-utilisateur-entreprise">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <line x1="19" y1="8" x2="19" y2="14"/>
+                            <line x1="22" y1="11" x2="16" y2="11"/>
+                        </svg>
+                        Inviter
+                    </button>
+                </div>
+
+                <!-- Liste par sections hiérarchiques -->
+                <div id="liste-utilisateurs-entreprise">
+
+                    <!-- Administrateurs -->
+                    <div class="groupe-role-entreprise">
+                        <div class="etiquette-groupe-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                            Administrateurs
+                        </div>
+                        <div class="liste-membres-entreprise">
+                            <div class="membre-entreprise" data-role-entreprise="administrateur" data-nom-entreprise="Amara Diallo" data-email-entreprise="amara.diallo@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Amara Diallo</div>
+                                    <div class="email-membre-entreprise">amara.diallo@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Éditeurs -->
+                    <div class="groupe-role-entreprise">
+                        <div class="etiquette-groupe-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                            Éditeurs
+                        </div>
+                        <div class="liste-membres-entreprise">
+                            <div class="membre-entreprise" data-role-entreprise="editeur" data-nom-entreprise="Fatou Ndiaye" data-email-entreprise="fatou.ndiaye@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Fatou Ndiaye</div>
+                                    <div class="email-membre-entreprise">fatou.ndiaye@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                            <div class="membre-entreprise" data-role-entreprise="editeur" data-nom-entreprise="Youssef Ben Ali" data-email-entreprise="youssef.ba@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Youssef Ben Ali</div>
+                                    <div class="email-membre-entreprise">youssef.ba@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coordinateurs -->
+                    <div class="groupe-role-entreprise">
+                        <div class="etiquette-groupe-entreprise">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                            Coordinateurs
+                        </div>
+                        <div class="liste-membres-entreprise">
+                            <div class="membre-entreprise" data-role-entreprise="coordinateur" data-nom-entreprise="Grâce Mboma" data-email-entreprise="grace.mboma@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Grâce Mboma</div>
+                                    <div class="email-membre-entreprise">grace.mboma@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                            <div class="membre-entreprise" data-role-entreprise="coordinateur" data-nom-entreprise="Samuel Lukaku" data-email-entreprise="samuel.luk@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Samuel Lukaku</div>
+                                    <div class="email-membre-entreprise">samuel.luk@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auditeurs -->
+                    <div class="groupe-role-entreprise">
+                        <div class="etiquette-groupe-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+                            Auditeurs
+                        </div>
+                        <div class="liste-membres-entreprise">
+                            <div class="membre-entreprise" data-role-entreprise="auditeur" data-nom-entreprise="Aïcha Traoré" data-email-entreprise="aicha.t@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Aïcha Traoré</div>
+                                    <div class="email-membre-entreprise">aicha.t@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opérateurs -->
+                    <div class="groupe-role-entreprise">
+                        <div class="etiquette-groupe-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                            Opérateurs
+                        </div>
+                        <div class="liste-membres-entreprise">
+                            <div class="membre-entreprise" data-role-entreprise="operateur" data-nom-entreprise="David Kalume" data-email-entreprise="david.k@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">David Kalume</div>
+                                    <div class="email-membre-entreprise">david.k@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                            <div class="membre-entreprise" data-role-entreprise="operateur" data-nom-entreprise="Noëlla Kasongo" data-email-entreprise="noella.kas@mail.com" data-photo-entreprise="">
+                                <div class="avatar-membre-entreprise">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="infos-membre-entreprise">
+                                    <div class="nom-membre-entreprise">Noëlla Kasongo</div>
+                                    <div class="email-membre-entreprise">noella.kas@mail.com</div>
+                                </div>
+                                <svg class="chevron-membre-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Zone actions bas -->
+            <div class="zone-actions-entreprise">
+                <div class="titre-zone-actions-entreprise">Paramètres</div>
+                <div class="carte-actions-entreprise">
+
+                    <!-- Verrouiller -->
+                    <div class="action-entreprise" id="action-verrouiller-entreprise">
+                        <div class="icone-action-entreprise verrouiller-entreprise">
+                            <svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <div class="texte-action-entreprise">
+                            <div class="label-action-entreprise">Verrouiller l'entreprise</div>
+                            <div class="desc-action-entreprise">Suspendre l'accès de tous les non-administrateurs</div>
+                        </div>
+                        <label class="interrupteur-entreprise" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="verrou-entreprise">
+                            <span class="curseur-entreprise"></span>
+                        </label>
+                    </div>
+
+                    <!-- Changer -->
+                    <button class="action-entreprise" id="ouvrir-changer-entreprise">
+                        <div class="icone-action-entreprise changer-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                        </div>
+                        <div class="texte-action-entreprise">
+                            <div class="label-action-entreprise">Changer d'entreprise</div>
+                            <div class="desc-action-entreprise">Basculer vers un autre espace de travail</div>
+                        </div>
+                        <svg class="chevron-action-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+
+                    <!-- Quitter -->
+                    <button class="action-entreprise" id="btn-quitter-entreprise">
+                        <div class="icone-action-entreprise quitter-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        </div>
+                        <div class="texte-action-entreprise">
+                            <div class="label-action-entreprise label-quitter-entreprise">Quitter l'entreprise</div>
+                            <div class="desc-action-entreprise">Retirer votre compte de cette équipe</div>
+                        </div>
+                        <svg class="chevron-action-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="overlay-entreprise" id="overlay-entreprise"></div>
+
+    <!-- ===== BOTTOM-SHEET : INVITER UN UTILISATEUR (choix de rôle) ===== -->
+    <div class="panneau-entreprise" id="panneau-invitation-entreprise">
+        <div class="poignee-panneau-entreprise"><span></span></div>
+        <div class="entete-panneau-entreprise">
+            <div class="titre-panneau-entreprise">Inviter un membre</div>
+            <div class="sous-titre-panneau-entreprise">Sélectionnez le rôle à attribuer</div>
+        </div>
+        <div class="corps-panneau-entreprise">
+
+            <!-- Administrateur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="administrateur">
+                <div class="icone-role-entreprise role-administrateur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Administrateur</div>
+                    <div class="desc-role-entreprise">Contrôle total sur l'application, les membres et les paramètres système.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Tout</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Éditeur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="editeur">
+                <div class="icone-role-entreprise role-editeur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Éditeur</div>
+                    <div class="desc-role-entreprise">Gère le catalogue produits et l'ensemble des mouvements de stock.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Créer</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Modifier</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/></svg>Entrée</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Sortie</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>Inventaire</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Coordinateur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="coordinateur">
+                <div class="icone-role-entreprise role-coordinateur-entreprise">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Coordinateur</div>
+                    <div class="desc-role-entreprise">Supervise les flux de stock et effectue les corrections d'inventaire.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/></svg>Entrée</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Sortie</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>Inventaire</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Auditeur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="auditeur">
+                <div class="icone-role-entreprise role-auditeur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Auditeur</div>
+                    <div class="desc-role-entreprise">Vérifie et ajuste les niveaux de stock via l'inventaire correctif.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>Inventaire</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Opérateur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="operateur">
+                <div class="icone-role-entreprise role-operateur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Opérateur</div>
+                    <div class="desc-role-entreprise">Enregistre les mouvements d'entrée et de sortie de marchandises.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/></svg>Entrée</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Sortie</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== BOTTOM-SHEET : PROFIL UTILISATEUR ===== -->
+    <div class="panneau-entreprise" id="panneau-profil-utilisateur-entreprise">
+        <div class="poignee-panneau-entreprise"><span></span></div>
+        <div class="corps-panneau-entreprise">
+
+            <!-- Profil -->
+            <div class="profil-panneau-entreprise">
+                <div class="avatar-profil-panneau-entreprise" id="avatar-panneau-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="nom-profil-panneau-entreprise" id="nom-panneau-entreprise">—</div>
+                <div class="email-profil-panneau-entreprise" id="email-panneau-entreprise">—</div>
+            </div>
+
+            <!-- Zone rôles -->
+            <div class="zone-roles-panneau-entreprise">
+                <div class="label-roles-panneau-entreprise">Rôle</div>
+                <div class="tags-roles-panneau-entreprise" id="tags-roles-panneau-entreprise">
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="administrateur">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                        Admin
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="editeur">
+                        <svg viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                        Éditeur
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="coordinateur">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                        Coord.
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="auditeur">
+                        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+                        Auditeur
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="operateur">
+                        <svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        Opérateur
+                    </button>
+                </div>
+            </div>
+
+            <!-- Description dynamique -->
+            <div class="description-role-panneau-entreprise" id="description-role-panneau-entreprise">
+                Sélectionnez un rôle pour voir les permissions associées.
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-profil-panneau-entreprise">
+                <button class="btn-modifier-role-entreprise" id="btn-modifier-role-entreprise" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    Modifier le rôle
+                </button>
+                <button class="btn-retirer-membre-entreprise" id="btn-retirer-membre-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="11" x2="22" y2="11"/></svg>
+                    Retirer de l'équipe
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== QR CODE PLEIN ÉCRAN ===== -->
+    <div class="qr-plein-ecran-entreprise" id="qr-plein-ecran-entreprise">
+        <div class="entete-qr-entreprise">
+            <button class="btn-fermer-qr-entreprise" id="btn-fermer-qr-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <button class="btn-exporter-qr-entreprise" id="btn-exporter-qr-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exporter
+            </button>
+        </div>
+        <div class="contenu-qr-entreprise">
+            <p class="invitation-qr-entreprise" id="invitation-qr-entreprise">Mon Entreprise vous invite à rejoindre l'équipe en tant que</p>
+            <div class="carte-qr-entreprise">
+                <div id="qrcode-entreprise"></div>
+                <div class="infos-qr-entreprise">
+                    <div class="nom-entreprise-qr" id="nom-entreprise-qr">Mon Entreprise</div>
+                    <div class="role-qr-entreprise" id="role-qr-entreprise">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span id="nom-role-qr-entreprise">Opérateur</span>
+                    </div>
+                </div>
+            </div>
+            <p class="instructions-qr-entreprise">
+                <strong>Comment utiliser ce QR code</strong>
+                L'invité doit scanner ce code avec l'application pour rejoindre automatiquement l'entreprise. Vous pouvez également exporter cette image et la lui envoyer par message — il pourra alors l'importer dans l'application.
+            </p>
+        </div>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // ==================== DONNÉES DES RÔLES ENTREPRISE ====================
+        const donneesRolesEntreprise = {
+            administrateur: {
+                nom: "Administrateur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> dispose d'un accès complet : gestion des membres, paramètres système, autorisations et supervision de l'ensemble de l'activité.`;
+                },
+                actions: ["Tout gérer"]
+            },
+            editeur: {
+                nom: "Éditeur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> peut créer, modifier et supprimer des produits, ainsi qu'enregistrer les entrées, sorties et inventaires.`;
+                },
+                actions: ["Créer", "Modifier", "Supprimer", "Entrée", "Sortie", "Inventaire"]
+            },
+            coordinateur: {
+                nom: "Coordinateur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> supervise les flux de stock en enregistrant les entrées, sorties et en effectuant les corrections d'inventaire.`;
+                },
+                actions: ["Entrée", "Sortie", "Inventaire"]
+            },
+            auditeur: {
+                nom: "Auditeur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> est habilité à vérifier les niveaux de stock et à appliquer les corrections nécessaires via l'inventaire.`;
+                },
+                actions: ["Inventaire"]
+            },
+            operateur: {
+                nom: "Opérateur",
+                description: function(prenom) {
+                    return `<strong>${prenom}</strong> enregistre les mouvements de marchandises : réceptions en entrée et expéditions en sortie.`;
+                },
+                actions: ["Entrée", "Sortie"]
+            }
+        };
+
+        // ==================== VARIABLES ENTREPRISE ====================
+        let roleCourantMembreEntreprise = null;
+        let roleSelectionneMembreEntreprise = null;
+        let membreSelectionneEntreprise = null;
+        let instanceQrCodeEntreprise = null;
+
+        // ==================== ÉLÉMENTS DOM ENTREPRISE ====================
+        const overlayEntreprise = document.getElementById('overlay-entreprise');
+        const panneauInvitationEntreprise = document.getElementById('panneau-invitation-entreprise');
+        const panneauProfilEntreprise = document.getElementById('panneau-profil-utilisateur-entreprise');
+        const qrPleinEcranEntreprise = document.getElementById('qr-plein-ecran-entreprise');
+
+        // ==================== FONCTIONS UTILITAIRES ENTREPRISE ====================
+        function ouvrirPanneauEntreprise(panneau) {
+            overlayEntreprise.classList.add('actif');
+            panneau.classList.add('actif');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fermerPanneauEntreprise(panneau) {
+            overlayEntreprise.classList.remove('actif');
+            panneau.classList.remove('actif');
+            document.body.style.overflow = '';
+        }
+
+        function fermerTousPanneauxEntreprise() {
+            overlayEntreprise.classList.remove('actif');
+            panneauInvitationEntreprise.classList.remove('actif');
+            panneauProfilEntreprise.classList.remove('actif');
+            document.body.style.overflow = '';
+        }
+
+        function extrairePrenomEntreprise(nomComplet) {
+            return nomComplet.split(' ')[0];
+        }
+
+        // ==================== OUVRIR INVITATION (AJOUTER UTILISATEUR) ====================
+        document.getElementById('btn-ajouter-utilisateur-entreprise').addEventListener('click', () => {
+            ouvrirPanneauEntreprise(panneauInvitationEntreprise);
+        });
+
+        // ==================== SÉLECTION D'UN RÔLE POUR INVITATION → QR CODE ====================
+        document.querySelectorAll('[data-role-invitation-entreprise]').forEach(carte => {
+            carte.addEventListener('click', () => {
+                const roleEntreprise = carte.getAttribute('data-role-invitation-entreprise');
+                const infosRoleEntreprise = donneesRolesEntreprise[roleEntreprise];
+
+                fermerPanneauEntreprise(panneauInvitationEntreprise);
+
+                // Mettre à jour le QR
+                const nomEntrepriseEntreprise = document.getElementById('nom-entreprise-affichage').textContent;
+                document.getElementById('invitation-qr-entreprise').textContent =
+                    `${nomEntrepriseEntreprise} vous invite à rejoindre l'équipe en tant que`;
+                document.getElementById('nom-entreprise-qr').textContent = nomEntrepriseEntreprise;
+                document.getElementById('nom-role-qr-entreprise').textContent = infosRoleEntreprise.nom;
+
+                // Générer le QR code
+                const conteneurQrEntreprise = document.getElementById('qrcode-entreprise');
+                conteneurQrEntreprise.innerHTML = '';
+
+                const donneeQrEntreprise = JSON.stringify({
+                    type: 'invitation',
+                    entreprise: nomEntrepriseEntreprise,
+                    role: roleEntreprise,
+                    date: new Date().toISOString()
+                });
+
+                if (typeof QRCode !== 'undefined') {
+                    instanceQrCodeEntreprise = new QRCode(conteneurQrEntreprise, {
+                        text: donneeQrEntreprise,
+                        width: 200,
+                        height: 200,
+                        colorDark: "#1a1a2e",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } else {
+                    conteneurQrEntreprise.innerHTML = '<div style="width:200px;height:200px;background:var(--fond-tertiaire);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--texte-secondaire);font-size:0.75rem;">QR Code</div>';
+                }
+
+                setTimeout(() => {
+                    qrPleinEcranEntreprise.classList.add('actif');
+                }, 280);
+            });
+        });
+
+        // ==================== FERMER QR CODE ====================
+        document.getElementById('btn-fermer-qr-entreprise').addEventListener('click', () => {
+            qrPleinEcranEntreprise.classList.remove('actif');
+        });
+
+        // ==================== CLIC SUR UN MEMBRE → PROFIL ====================
+        document.querySelectorAll('.membre-entreprise').forEach(membre => {
+            membre.addEventListener('click', () => {
+                const nomEntreprise = membre.getAttribute('data-nom-entreprise');
+                const emailEntreprise = membre.getAttribute('data-email-entreprise');
+                const roleEntreprise = membre.getAttribute('data-role-entreprise');
+
+                membreSelectionneEntreprise = { nom: nomEntreprise, email: emailEntreprise, role: roleEntreprise };
+                roleCourantMembreEntreprise = roleEntreprise;
+                roleSelectionneMembreEntreprise = roleEntreprise;
+
+                // Remplir le profil
+                document.getElementById('nom-panneau-entreprise').textContent = nomEntreprise;
+                document.getElementById('email-panneau-entreprise').textContent = emailEntreprise;
+
+                // Sélectionner le bon tag
+                mettreAJourTagsRolesEntreprise(roleEntreprise);
+
+                // Description
+                mettreAJourDescriptionRoleEntreprise(nomEntreprise, roleEntreprise);
+
+                // Bouton modifier désactivé par défaut
+                const btnModifierEntreprise = document.getElementById('btn-modifier-role-entreprise');
+                btnModifierEntreprise.disabled = true;
+
+                ouvrirPanneauEntreprise(panneauProfilEntreprise);
+            });
+        });
+
+        // ==================== MISE À JOUR DES TAGS RÔLES ====================
+        function mettreAJourTagsRolesEntreprise(roleActifEntreprise) {
+            document.querySelectorAll('[data-tag-role-entreprise]').forEach(tag => {
+                tag.classList.toggle('selectionne-entreprise', tag.getAttribute('data-tag-role-entreprise') === roleActifEntreprise);
+            });
+        }
+
+        // ==================== MISE À JOUR DESCRIPTION RÔLE ====================
+        function mettreAJourDescriptionRoleEntreprise(nomCompletEntreprise, roleEntreprise) {
+            const prenomEntreprise = extrairePrenomEntreprise(nomCompletEntreprise);
+            const descriptionEntreprise = donneesRolesEntreprise[roleEntreprise];
+            if (descriptionEntreprise) {
+                document.getElementById('description-role-panneau-entreprise').innerHTML = descriptionEntreprise.description(prenomEntreprise);
+            }
+        }
+
+        // ==================== CLIC SUR UN TAG RÔLE DANS LE PROFIL ====================
+        document.querySelectorAll('[data-tag-role-entreprise]').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const nouveauRoleEntreprise = tag.getAttribute('data-tag-role-entreprise');
+                roleSelectionneMembreEntreprise = nouveauRoleEntreprise;
+
+                mettreAJourTagsRolesEntreprise(nouveauRoleEntreprise);
+
+                if (membreSelectionneEntreprise) {
+                    mettreAJourDescriptionRoleEntreprise(membreSelectionneEntreprise.nom, nouveauRoleEntreprise);
+                }
+
+                // Activer/désactiver le bouton modifier
+                const btnModifierEntreprise = document.getElementById('btn-modifier-role-entreprise');
+                btnModifierEntreprise.disabled = (nouveauRoleEntreprise === roleCourantMembreEntreprise);
+            });
+        });
+
+        // ==================== BOUTON MODIFIER RÔLE ====================
+        document.getElementById('btn-modifier-role-entreprise').addEventListener('click', () => {
+            if (membreSelectionneEntreprise && roleSelectionneMembreEntreprise !== roleCourantMembreEntreprise) {
+                const ancienRoleEntreprise = donneesRolesEntreprise[roleCourantMembreEntreprise].nom;
+                const nouveauRoleEntreprise = donneesRolesEntreprise[roleSelectionneMembreEntreprise].nom;
+
+                alert(`Rôle de ${membreSelectionneEntreprise.nom} modifié : ${ancienRoleEntreprise} → ${nouveauRoleEntreprise}`);
+
+                fermerPanneauEntreprise(panneauProfilEntreprise);
+            }
+        });
+
+        // ==================== BOUTON RETIRER MEMBRE ====================
+        document.getElementById('btn-retirer-membre-entreprise').addEventListener('click', () => {
+            if (membreSelectionneEntreprise) {
+                if (confirm(`Retirer ${membreSelectionneEntreprise.nom} de l'équipe ?`)) {
+                    alert(`${membreSelectionneEntreprise.nom} a été retiré de l'équipe.`);
+                    fermerPanneauEntreprise(panneauProfilEntreprise);
+                }
+            }
+        });
+
+        // ==================== FERMER VIA OVERLAY ====================
+        overlayEntreprise.addEventListener('click', fermerTousPanneauxEntreprise);
+
+        // ==================== VERROUILLAGE ENTREPRISE ====================
+        document.getElementById('verrou-entreprise').addEventListener('change', function() {
+            if (this.checked) {
+                alert("L'entreprise est verrouillée. Seuls les administrateurs conservent l'accès.");
+            } else {
+                alert("L'entreprise est déverrouillée. Tous les membres retrouvent leur accès.");
+            }
+        });
+
+        // ==================== QUITTER L'ENTREPRISE ====================
+        document.getElementById('btn-quitter-entreprise').addEventListener('click', () => {
+            if (confirm("Êtes-vous sûr de vouloir quitter cette entreprise ? Cette action est irréversible.")) {
+                alert("Vous avez quitté l'entreprise.");
+            }
+        });
+
+        // ==================== EXPORTER QR CODE ====================
+        document.getElementById('btn-exporter-qr-entreprise').addEventListener('click', () => {
+            const canvasEntreprise = document.querySelector('#qrcode-entreprise canvas');
+            const imgEntreprise = document.querySelector('#qrcode-entreprise img');
+
+            let urlDonneeEntreprise = null;
+
+            if (canvasEntreprise) {
+                urlDonneeEntreprise = canvasEntreprise.toDataURL('image/png');
+            } else if (imgEntreprise) {
+                urlDonneeEntreprise = imgEntreprise.src;
+            }
+
+            if (urlDonneeEntreprise) {
+                const lienEntreprise = document.createElement('a');
+                lienEntreprise.download = 'invitation-qr-entreprise.png';
+                lienEntreprise.href = urlDonneeEntreprise;
+                lienEntreprise.click();
+            } else {
+                alert("Aucun QR code à exporter.");
+            }
+        });
+
+        // ==================== COMPTEUR UTILISATEURS ====================
+        function mettreAJourCompteurEntreprise() {
+            const totalEntreprise = document.querySelectorAll('.membre-entreprise').length;
+            document.getElementById('compteur-utilisateurs-entreprise').textContent = totalEntreprise;
+        }
+
+        mettreAJourCompteurEntreprise();
+    </script>
+</body>
+</html>
