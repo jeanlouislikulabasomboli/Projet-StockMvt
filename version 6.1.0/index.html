@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StockMvt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Écran Langue -->
+    <div class="ecran ecran-langue actif" id="ecran-langue">
+        <div class="logo-conteneur">
+            <div class="logo-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18"/>
+                    <path d="M5 21V7l8-4v18"/>
+                    <path d="M19 21V11l-6-4"/>
+                    <path d="M9 9v.01"/>
+                    <path d="M9 12v.01"/>
+                    <path d="M9 15v.01"/>
+                    <path d="M9 18v.01"/>
+                </svg>
+            </div>
+            <h1 class="logo-titre">StockMvt</h1>
+        </div>
+        <div class="langue-liste">
+            <button class="langue-btn" data-langue="fr">
+                <span class="langue-emoji">🇫🇷</span>
+                <span class="langue-nom">Français</span>
+            </button>
+            <button class="langue-btn" data-langue="en">
+                <span class="langue-emoji">🇬🇧</span>
+                <span class="langue-nom">English</span>
+            </button>
+            <button class="langue-btn" data-langue="hi">
+                <span class="langue-emoji">🇮🇳</span>
+                <span class="langue-nom">हिन्दी</span>
+            </button>
+            <button class="langue-btn" data-langue="ln">
+                <span class="langue-emoji">🇨🇩</span>
+                <span class="langue-nom">Lingala</span>
+            </button>
+            <button class="langue-btn" data-langue="sw">
+                <span class="langue-emoji">🇨🇩</span>
+                <span class="langue-nom">Swahili</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Écran Mode -->
+    <div class="ecran ecran-mode" id="ecran-mode">
+        <h2 class="mode-titre">Choisir le mode</h2>
+        <p class="mode-soustitre">Sélectionnez votre préférence d'affichage</p>
+        <div class="mode-liste">
+            <button class="mode-btn actif" data-mode="systeme">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                <div class="mode-btn-texte">
+                    <div class="mode-btn-titre">Système</div>
+                    <div class="mode-btn-desc">Suit les paramètres système</div>
+                </div>
+            </button>
+            <button class="mode-btn" data-mode="clair">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2"/>
+                    <path d="M12 20v2"/>
+                    <path d="m4.93 4.93 1.41 1.41"/>
+                    <path d="m17.66 17.66 1.41 1.41"/>
+                    <path d="M2 12h2"/>
+                    <path d="M20 12h2"/>
+                    <path d="m6.34 17.66-1.41 1.41"/>
+                    <path d="m19.07 4.93-1.41 1.41"/>
+                </svg>
+                <div class="mode-btn-texte">
+                    <div class="mode-btn-titre">Clair</div>
+                    <div class="mode-btn-desc">Thème lumineux</div>
+                </div>
+            </button>
+            <button class="mode-btn" data-mode="sombre">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                </svg>
+                <div class="mode-btn-texte">
+                    <div class="mode-btn-titre">Sombre</div>
+                    <div class="mode-btn-desc">Thème sombre</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Écran Onboarding -->
+    <div class="ecran ecran-onboarding" id="ecran-onboarding">
+        <div class="onboarding-conteneur">
+            <div class="onboarding-slides">
+                <div class="onboarding-slide actif" data-slide="0">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 8v4l3 3"/>
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Historique complet</h3>
+                    <p class="onboarding-desc">Gardez une trace de tous vos mouvements de stock avec un historique détaillé et consultable.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="1">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="m19 9-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Analyses détaillées</h3>
+                    <p class="onboarding-desc">Suivez vos quantités, achats, ventes et pertes avec des calculs automatiques et précis.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="2">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Multi-utilisateurs</h3>
+                    <p class="onboarding-desc">Collaborez avec votre équipe et gérez les accès et autorisations de chaque membre.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="3">
+                    <div class="onboarding-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h3 class="onboarding-titre">Sauvegarde cloud</h3>
+                    <p class="onboarding-desc">Vos données sont automatiquement sauvegardées et accessibles depuis n'importe quel appareil.</p>
+                </div>
+            </div>
+            <div class="onboarding-indicateurs">
+                <div class="onboarding-indicateur actif"></div>
+                <div class="onboarding-indicateur"></div>
+                <div class="onboarding-indicateur"></div>
+                <div class="onboarding-indicateur"></div>
+            </div>
+            <button class="onboarding-btn" id="btn-onboarding-suivant">Suivant</button>
+        </div>
+    </div>
+
+    <!-- Écran Authentification -->
+    <div class="ecran ecran-auth" id="ecran-auth">
+        <div class="auth-contenu">
+            <div class="auth-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+            </div>
+            <h2 class="auth-titre">Bienvenue</h2>
+            <p class="auth-desc">Connectez-vous avec votre compte Google pour accéder à votre espace de gestion de stock.</p>
+            <button class="google-btn" id="btn-google">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continuer avec Google
+            </button>
+        </div>
+    </div>
+
+<!-- Écran Choix Entreprise -->
+<div class="ecran ecran-choix-entreprise" id="ecran-choix-entreprise">
+    <div class="choix-entreprise-app">
+        <div class="choix-entreprise-top">
+            <div class="choix-entreprise-badge">Espace entreprise</div>
+            <h1 class="choix-entreprise-title">Choisissez votre entreprise</h1>
+            <p class="choix-entreprise-subtitle">
+                Créez une entreprise ou sélectionnez une entreprise existante pour continuer.
+            </p>
+        </div>
+
+        <div class="choix-entreprise-card">
+            <div class="choix-entreprise-actions">
+                <button class="choix-entreprise-action-btn" id="btn-creer-entreprise">
+                    <div class="choix-entreprise-action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 21h18"></path>
+                            <path d="M5 21V7l7-4 7 4v14"></path>
+                            <path d="M9 10h.01"></path>
+                            <path d="M15 10h.01"></path>
+                            <path d="M9 14h.01"></path>
+                            <path d="M15 14h.01"></path>
+                        </svg>
+                    </div>
+                    <div class="choix-entreprise-action-title">Créer</div>
+                    <div class="choix-entreprise-action-text">Créer une nouvelle entreprise.</div>
+                </button>
+
+                <button class="choix-entreprise-action-btn" id="btn-rejoindre-entreprise">
+                    <div class="choix-entreprise-action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 7h3a5 5 0 0 1 0 10h-3"></path>
+                            <path d="M9 17H6a5 5 0 0 1 0-10h3"></path>
+                            <path d="M8 12h8"></path>
+                        </svg>
+                    </div>
+                    <div class="choix-entreprise-action-title">Rejoindre</div>
+<div class="choix-entreprise-action-text">Scanner un QR code d'invitation.</div>
+
+                </button>
+            </div>
+        </div>
+
+        <div class="choix-entreprise-card">
+            <div class="choix-entreprise-section-title">Vos entreprises</div>
+            <div id="choix-entreprise-liste"></div>
+        </div>
+
+        <div class="choix-entreprise-bottom-bar">
+            <button class="choix-entreprise-continue-btn" id="btn-choix-entreprise-continuer" disabled>
+                Continuer
+            </button>
+            <p class="choix-entreprise-helper" id="texte-choix-entreprise-helper">
+                Sélectionnez une entreprise pour continuer.
+            </p>
+        </div>
+    </div>
+</div>
+
+    <!-- Écran Créer Entreprise -->
+    <div class="ecran ecran-creer-entreprise" id="ecran-creer-entreprise">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-choix">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+<h2 class="entete-titre" id="titre-formulaire-entreprise">Créer une entreprise</h2>
+        </div>
+        <div class="formulaire-contenu">
+            <div class="formulaire-section">
+                <label class="formulaire-label">Logo de l'entreprise</label>
+<div class="logo-upload" id="zone-logo-upload">
+    <input type="file" id="input-logo-entreprise" accept="image/*" style="display: none;">
+
+    <img id="preview-logo-entreprise" class="logo-upload-image" alt="Aperçu logo">
+
+    <div class="logo-upload-placeholder" id="logo-upload-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="9" cy="9" r="2"/>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+        </svg>
+        <span class="logo-upload-texte">Ajouter</span>
+    </div>
+</div>
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Nom de l'entreprise</label>
+                <input type="text" class="formulaire-input" placeholder="Ex: Mon Entreprise" id="input-nom-entreprise">
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Description (optionnel)</label>
+                <textarea class="formulaire-input formulaire-textarea" placeholder="Décrivez votre entreprise..." id="input-description"></textarea>
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Devise</label>
+                <input type="text" class="formulaire-input" placeholder="Ex: USD, EUR, CDF..." id="input-devise">
+            </div>
+            <div class="formulaire-section">
+                <label class="formulaire-label">Thème</label>
+                <div class="theme-grille">
+                    <div class="theme-option actif" style="background: #2d3436;" data-theme="#2d3436"></div>
+                    <div class="theme-option" style="background: #00b894;" data-theme="#00b894"></div>
+                    <div class="theme-option" style="background: #0984e3;" data-theme="#0984e3"></div>
+                    <div class="theme-option" style="background: #6c5ce7;" data-theme="#6c5ce7"></div>
+                    <div class="theme-option" style="background: #e17055;" data-theme="#e17055"></div>
+                    <div class="theme-option" style="background: #fdcb6e;" data-theme="#fdcb6e"></div>
+                    <div class="theme-option" style="background: #00cec9;" data-theme="#00cec9"></div>
+                    <div class="theme-option" style="background: #fd79a8;" data-theme="#fd79a8"></div>
+                </div>
+            </div>
+            <button class="btn-valider" id="btn-valider-entreprise">Créer l'entreprise</button>
+        </div>
+    </div>
+
+    <!-- Écran Accueil -->
+    <div class="ecran ecran-accueil" id="ecran-accueil">
+        <div class="accueil-entete">
+            <div class="accueil-entete-gauche">
+<div class="accueil-logo">
+    <img id="accueil-logo-img" class="logo-entreprise-image" alt="Logo entreprise">
+
+    <svg id="accueil-logo-svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21h18"/>
+        <path d="M5 21V7l8-4v18"/>
+        <path d="M19 21V11l-6-4"/>
+    </svg>
+</div>
+                <span class="accueil-nom-entreprise">Mon Entreprise</span>
+            </div>
+            <button class="notification-btn" id="btn-notifications">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+                <span class="notification-badge"></span>
+            </button>
+        </div>
+        <div class="accueil-contenu">
+            <div class="accueil-bienvenue">
+<h2 class="accueil-bienvenue-titre" id="texte-bienvenue-utilisateur">Bonjour</h2>
+                <p class="accueil-bienvenue-texte">Voici l'état de votre stock aujourd'hui</p>
+            </div>
+            <div class="statistiques-grille">
+                <div class="stat-carte">
+                    <div class="stat-icone stocks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">156</div>
+                    <div class="stat-label">En stock</div>
+                </div>
+                <div class="stat-carte">
+                    <div class="stat-icone faible">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">12</div>
+                    <div class="stat-label">Stock faible</div>
+                </div>
+                <div class="stat-carte">
+                    <div class="stat-icone rupture">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">3</div>
+                    <div class="stat-label">Rupture</div>
+                </div>
+                <div class="stat-carte">
+                    <div class="stat-icone valeur">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-valeur">45 280 $</div>
+                    <div class="stat-label">Valeur totale</div>
+                </div>
+            </div>
+            <h3 class="section-titre">Mouvements récents</h3>
+            <div class="mouvements-recents" id="mouvements-recents">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Écran Produits -->
+    <div class="ecran ecran-produits" id="ecran-produits">
+        <div class="produits-entete">
+            <div class="produits-recherche">
+                <div class="recherche-input-conteneur">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" class="recherche-input" placeholder="Rechercher un produit...">
+                </div>
+                <button class="scanner-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                        <line x1="7" y1="12" x2="17" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="produits-onglets">
+                <button class="onglet-btn actif">Tous <span class="onglet-nombre">89</span></button>
+                <button class="onglet-btn">En stock <span class="onglet-nombre">74</span></button>
+                <button class="onglet-btn">Faible <span class="onglet-nombre">12</span></button>
+                <button class="onglet-btn">Rupture <span class="onglet-nombre">3</span></button>
+            </div>
+        </div>
+        <div class="produits-liste" id="produits-liste">
+            <!-- Rempli dynamiquement -->
+        </div>
+        <button class="btn-flottant" id="btn-ajout-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Écran Historique -->
+    <div class="ecran ecran-historique" id="ecran-historique">
+        <div class="historique-entete">
+            <h2 class="historique-titre">Historique</h2>
+            <div class="historique-filtres">
+                <button class="filtre-btn actif">Tous <span>247</span></button>
+                <button class="filtre-btn">Entrées <span>142</span></button>
+                <button class="filtre-btn">Sorties <span>89</span></button>
+                <button class="filtre-btn">Inventaires <span>16</span></button>
+            </div>
+            <div class="date-select">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Cette semaine</span>
+            </div>
+        </div>
+        <div class="historique-liste" id="historique-liste">
+            <!-- Rempli dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Écran Notifications -->
+    <div class="ecran ecran-notifications" id="ecran-notifications">
+        <div class="notifications-entete">
+            <h2 class="notifications-titre">Notifications</h2>
+            <div class="notifications-onglets">
+                <button class="notif-onglet actif">Tous</button>
+                <button class="notif-onglet">Non lu <span>5</span></button>
+            </div>
+        </div>
+        <div class="notifications-liste" id="notifications-liste">
+            <!-- Rempli dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Écran Rapports -->
+    <div class="ecran ecran-rapports" id="ecran-rapports">
+        <div class="rapports-entete">
+            <h2 class="rapports-titre">Rapports</h2>
+        </div>
+        <div class="rapports-contenu">
+            <div class="rapport-section">
+                <h3 class="rapport-section-titre">Rapports d'actualité</h3>
+                <div class="rapport-carte" data-rapport="global">
+                    <div class="rapport-icone stocks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">État global du stock</div>
+                        <div class="rapport-nombre">89 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="stock">
+                    <div class="rapport-icone stocks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">En stock</div>
+                        <div class="rapport-nombre">74 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="faible">
+                    <div class="rapport-icone faible">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Stock faible</div>
+                        <div class="rapport-nombre">12 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="rupture">
+                    <div class="rapport-icone rupture">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Rupture de stock</div>
+                        <div class="rapport-nombre">3 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="surstock">
+                    <div class="rapport-icone surstock">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18 17V9"/>
+                            <path d="M13 17V5"/>
+                            <path d="M8 17v-3"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Surstock</div>
+                        <div class="rapport-nombre">8 articles</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="rapport-section">
+                <h3 class="rapport-section-titre">Rapports budgétaires</h3>
+                <div class="rapport-carte" data-rapport="achats">
+                    <div class="rapport-icone achat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Achats</div>
+                        <div class="rapport-nombre">12 450 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="ventes">
+                    <div class="rapport-icone vente">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Ventes</div>
+                        <div class="rapport-nombre">28 760 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="pertes">
+                    <div class="rapport-icone perte">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="m7 14 4-4 4 4 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Pertes</div>
+                        <div class="rapport-nombre">1 250 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rapport-carte" data-rapport="finance">
+                    <div class="rapport-icone finance">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <div class="rapport-infos">
+                        <div class="rapport-nom">Rapport financier</div>
+                        <div class="rapport-nombre">Bénéfice: 16 310 $</div>
+                    </div>
+                    <div class="rapport-fleche">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Écran Aperçu Rapport -->
+    <div class="ecran ecran-apercu-rapport" id="ecran-apercu-rapport">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-rapports">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre" id="rapport-titre">État global du stock</h2>
+        </div>
+        <div class="rapport-entete-document">
+            <div class="rapport-entreprise">
+                <div class="rapport-entreprise-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="rapport-entreprise-nom">Mon Entreprise</div>
+                </div>
+            </div>
+            <div class="rapport-titre-document" id="rapport-soustitre">Rapport concernant l'état global du stock</div>
+            <div class="rapport-meta">
+                <div class="rapport-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;stroke:currentColor">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span id="rapport-date">Date: 15 Janvier 2025</span>
+                </div>
+                <div class="rapport-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;stroke:currentColor">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                    <span id="rapport-nombre">89 articles</span>
+                </div>
+                <div class="rapport-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;stroke:currentColor">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Responsable: Jean Dupont</span>
+                </div>
+            </div>
+        </div>
+        <div class="rapport-tableau-conteneur" id="rapport-tableau-conteneur">
+            <!-- Tableau généré dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Écran Menu -->
+    <div class="ecran ecran-menu" id="ecran-menu">
+        <div class="menu-entete">
+            <div class="menu-profil">
+<div class="menu-avatar" id="menu-avatar">
+<img id="menu-avatar-img" alt="Photo de profil utilisateur" referrerpolicy="no-referrer" style="display:none;">
+    <svg id="menu-avatar-svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+    </svg>
+</div>
+                <div>
+<div class="menu-profil-nom" id="menu-profil-nom">Utilisateur</div>
+<div class="menu-profil-email" id="menu-profil-email">email@example.com</div>
+                </div>
+            </div>
+        </div>
+        <div class="menu-contenu">
+            <div class="menu-section">
+                <div class="menu-section-titre">Général</div>
+                <div class="menu-item" id="menu-entreprise">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                    </svg>
+                    <span class="menu-item-texte">Entreprise</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menu-langue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span class="menu-item-texte">Langue</span>
+                    <div class="menu-item-droite">
+                        <span style="font-size:13px;color:var(--texte-secondaire)">Français</span>
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menu-mode">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <span class="menu-item-texte">Mode sombre</span>
+                    <div class="menu-interrupteur" id="toggle-mode"></div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-section-titre">Sécurité</div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <span class="menu-item-texte">Code PIN</span>
+                    <div class="menu-interrupteur"></div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span class="menu-item-texte">Verrouillage biométrique</span>
+                    <div class="menu-interrupteur"></div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="menu-item-texte">Question de sécurité</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-section-titre">Données</div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span class="menu-item-texte">Sauvegarder</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span class="menu-item-texte">Restaurer</span>
+                    <div class="menu-item-droite">
+                        <span style="font-size:11px;color:var(--texte-tertiaire)">Admin</span>
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                    </svg>
+                    <span class="menu-item-texte">Cloud</span>
+                    <div class="menu-item-droite">
+                        <span style="font-size:12px;color:var(--succes)">Synchronisé</span>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="menu-section-titre">Support</div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="menu-item-texte">Aide et support</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="menu-item-texte">Évaluer l'application</span>
+                    <div class="menu-item-droite">
+                        <div class="menu-item-fleche">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+<div class="menu-item menu-danger" id="btn-deconnexion">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+    <span class="menu-item-texte">Se déconnecter</span>
+</div>
+                <div class="menu-item menu-danger">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    <span class="menu-item-texte">Supprimer le compte</span>
+                </div>
+            </div>
+        </div>
+        <div class="menu-version">StockMvt v1.0.0</div>
+    </div>
+
+    <!-- Écran Entreprise -->
+    <div class="ecran ecran-entreprise" id="ecran-entreprise">
+
+        <!-- Entête -->
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-menu-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Entreprise</h2>
+        </div>
+
+        <!-- Contenu défilable -->
+        <div class="contenu-entreprise">
+
+            <!-- Profil Entreprise -->
+            <div class="profil-entreprise">
+                <button class="btn-editer-entreprise" id="ouvrir-edition-entreprise" title="Modifier les informations">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                        <path d="m15 5 4 4"/>
+                    </svg>
+                </button>
+                <div class="logo-entreprise">
+                    <img id="entreprise-logo-img" class="logo-entreprise-image" alt="Logo entreprise">
+                    <svg id="entreprise-logo-svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                        <path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/>
+                    </svg>
+                </div>
+                <h2 class="nom-entreprise" id="nom-entreprise-affichage">Mon Entreprise</h2>
+                <p class="description-entreprise" id="description-entreprise-affichage">Commerce de gros et détail de produits alimentaires</p>
+            </div>
+
+            <!-- Section Utilisateurs -->
+            <div class="section-utilisateurs-entreprise">
+                <div class="entete-utilisateurs-entreprise">
+                    <div class="titre-utilisateurs-entreprise">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span>Équipe</span>
+                        <span class="compteur-utilisateurs-entreprise" id="compteur-utilisateurs-entreprise">8</span>
+                    </div>
+                    <button class="btn-ajouter-utilisateur-entreprise" id="btn-ajouter-utilisateur-entreprise">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <line x1="19" y1="8" x2="19" y2="14"/>
+                            <line x1="22" y1="11" x2="16" y2="11"/>
+                        </svg>
+                        Inviter
+                    </button>
+                </div>
+
+                <!-- Liste par sections hiérarchiques -->
+<div id="liste-utilisateurs-entreprise">
+    <!-- Les membres seront chargés dynamiquement -->
+</div>
+
+            </div>
+
+            <!-- Zone actions bas -->
+            <div class="zone-actions-entreprise">
+                <div class="titre-zone-actions-entreprise">Paramètres</div>
+                <div class="carte-actions-entreprise">
+
+                    <!-- Verrouiller -->
+                    <div class="action-entreprise" id="action-verrouiller-entreprise">
+                        <div class="icone-action-entreprise verrouiller-entreprise">
+                            <svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <div class="texte-action-entreprise">
+                            <div class="label-action-entreprise">Verrouiller l'entreprise</div>
+                            <div class="desc-action-entreprise">Suspendre l'accès de tous les non-administrateurs</div>
+                        </div>
+                        <label class="interrupteur-entreprise" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="verrou-entreprise">
+                            <span class="curseur-entreprise"></span>
+                        </label>
+                    </div>
+
+                    <!-- Changer -->
+                    <button class="action-entreprise" id="ouvrir-changer-entreprise">
+                        <div class="icone-action-entreprise changer-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                        </div>
+                        <div class="texte-action-entreprise">
+                            <div class="label-action-entreprise">Changer d'entreprise</div>
+                            <div class="desc-action-entreprise">Basculer vers un autre espace de travail</div>
+                        </div>
+                        <svg class="chevron-action-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+
+                    <!-- Quitter -->
+                    <button class="action-entreprise" id="btn-quitter-entreprise">
+                        <div class="icone-action-entreprise quitter-entreprise">
+                            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        </div>
+                        <div class="texte-action-entreprise">
+                            <div class="label-action-entreprise label-quitter-entreprise">Quitter l'entreprise</div>
+                            <div class="desc-action-entreprise">Retirer votre compte de cette équipe</div>
+                        </div>
+                        <svg class="chevron-action-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Écran Détails Produit -->
+    <div class="ecran ecran-details-produit" id="ecran-details-produit">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-produits">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Détails du produit</h2>
+        </div>
+        <div class="details-actions">
+            <button class="action-btn entree" id="btn-entree">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14"/>
+                    <path d="m19 12-7 7-7-7"/>
+                </svg>
+                <span>Entrée</span>
+            </button>
+            <button class="action-btn sortie" id="btn-sortie">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19V5"/>
+                    <path d="m5 12 7-7 7 7"/>
+                </svg>
+                <span>Sortie</span>
+            </button>
+            <button class="action-btn" id="btn-inventaire">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                    <path d="m9 14 2 2 4-4"/>
+                </svg>
+                <span>Inventaire</span>
+            </button>
+        </div>
+        <div class="details-image">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+        </div>
+        <div class="details-contenu">
+            <h2 class="details-nom">Riz Premium 5kg</h2>
+            <p class="details-code">PRD-001 | 6123456789012</p>
+            
+            <div class="details-section">
+                <h4 class="details-section-titre">Informations de stock</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Quantité totale</div>
+                        <div class="details-item-valeur">156 unités</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Statut</div>
+                        <div class="details-item-valeur" style="color:var(--succes)">En stock</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Stock min.</div>
+                        <div class="details-item-valeur">20 unités</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Stock max.</div>
+                        <div class="details-item-valeur">500 unités</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Prix unitaires</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Prix d'achat</div>
+                        <div class="details-item-valeur">8.50 $</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Prix de vente</div>
+                        <div class="details-item-valeur">12.00 $</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Valorisation du stock</h4>
+                <div class="carte-valorisation-details-produit">
+                    <div class="ligne-valorisation-details-produit">
+                        <div class="colonne-valorisation-details-produit">
+                            <span class="etiquette-valorisation-details-produit">Valeur d'achat</span>
+                            <span class="montant-valorisation-details-produit">1 326.00 $</span>
+                        </div>
+                        <div class="separateur-valorisation-details-produit"></div>
+                        <div class="colonne-valorisation-details-produit">
+                            <span class="etiquette-valorisation-details-produit">Valeur de vente</span>
+                            <span class="montant-valorisation-details-produit">1 872.00 $</span>
+                        </div>
+                    </div>
+                    <div class="barre-marge-details-produit">
+                        <div class="barre-marge-remplissage-details-produit" style="width: 29.2%"></div>
+                    </div>
+                    <div class="ligne-benefice-details-produit">
+                        <div class="info-benefice-details-produit">
+                            <span class="etiquette-benefice-details-produit">Bénéfice potentiel</span>
+                            <span class="montant-benefice-details-produit">+ 546.00 $</span>
+                        </div>
+                        <div class="badge-marge-details-produit">29.2 %</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Emplacements</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Entrepôt A - Rayon 3</div>
+                        <div class="details-item-valeur">100 unités</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Magasin - Étagère B2</div>
+                        <div class="details-item-valeur">56 unités</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h4 class="details-section-titre">Informations supplémentaires</h4>
+                <div class="details-grille">
+                    <div class="details-item">
+                        <div class="details-item-label">Date d'ajout</div>
+                        <div class="details-item-valeur" style="font-size:14px">10 Jan 2025</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="details-item-label">Dernière modif.</div>
+                        <div class="details-item-valeur" style="font-size:14px">15 Jan 2025</div>
+                    </div>
+                </div>
+            </div>
+            
+                        <div class="details-section">
+                <h4 class="details-section-titre">Notes</h4>
+                <div class="bloc-note-details-produit">
+                    <p class="texte-note-details-produit">Produit importé. Fournisseur principal : Rizière du Sud. Prévoir une commande groupée si le stock descend sous 50 unités. Conditionnement par palette de 20 sacs.</p>
+                </div>
+            </div>
+
+
+            <button class="details-modifier-btn">Modifier le produit</button>
+            
+            <button class="details-supprimer-btn" id="btn-supprimer-produit">Supprimer le produit</button>
+
+        </div>
+    </div>
+
+    <!-- Écran Ajout Produit -->
+    <div class="ecran ecran-ajout-produit" id="ecran-ajout-produit">
+        <div class="entete-formulaire">
+            <button class="btn-retour" id="retour-ajout">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="entete-titre">Nouveau produit</h2>
+        </div>
+<div class="ajout-image-zone" id="zone-ajout-image-photo-produit">
+    <img class="apercu-final-photo-produit" id="apercu-final-photo-produit" alt="Photo produit" style="display:none;">
+    <div class="contenu-ajout-image-photo-produit" id="contenu-ajout-image-photo-produit">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="9" cy="9" r="2"/>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+        </svg>
+        <span>Prendre une photo ou sélectionner</span>
+    </div>
+    <button class="btn-supprimer-image-photo-produit" id="btn-supprimer-image-photo-produit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+        </svg>
+    </button>
+</div>
+
+        <div class="ajout-formulaire">
+    <div class="ajout-champ">
+        <label class="ajout-champ-label">Nom du produit *</label>
+        <input type="text" class="ajout-input" placeholder="Ex: Riz Premium 5kg">
+    </div>
+    <div class="ajout-champ">
+        <label class="ajout-champ-label">Code produit / Code-barres</label>
+        <div class="ajout-input-avec-icones">
+            <input type="text" class="ajout-input" placeholder="Ex: PRD-001">
+            <button class="ajout-icone-btn" title="Générer un code">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                </svg>
+            </button>
+            <button class="ajout-icone-btn" title="Scanner">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                    <line x1="7" y1="12" x2="17" y2="12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- CATÉGORIE — Sélection déroulante personnalisée -->
+    <div class="ajout-champ">
+        <label class="ajout-champ-label">Catégorie</label>
+        <div class="selecteur-personnalise" id="selecteur-categorie">
+            <div class="selecteur-affichage" id="affichage-categorie">
+                <span class="selecteur-texte" id="texte-categorie">Sélectionner une catégorie</span>
+                <svg class="selecteur-fleche" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6"/>
+                </svg>
+            </div>
+            <div class="selecteur-liste" id="liste-categorie">
+                <div class="selecteur-recherche-zone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <input type="text" class="selecteur-recherche" id="recherche-categorie" placeholder="Rechercher...">
+                </div>
+                <div class="selecteur-options" id="options-categorie">
+                    <div class="selecteur-option" data-valeur="alimentaire">Alimentaire</div>
+                    <div class="selecteur-option" data-valeur="boissons">Boissons</div>
+                    <div class="selecteur-option" data-valeur="hygiene">Hygiène</div>
+                    <div class="selecteur-option" data-valeur="menage">Ménage</div>
+                </div>
+                <div class="selecteur-vide" id="categorie-vide" style="display:none;">Aucun résultat</div>
+                <div class="selecteur-ajouter" id="btn-ajouter-categorie">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+                    <span>Ajouter une catégorie</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMPLACEMENTS — Multiples avec quantité -->
+    <div class="ajout-champ">
+        <label class="ajout-champ-label">Emplacements & Quantités *</label>
+        <div class="emplacements-conteneur" id="emplacements-conteneur">
+            <div class="emplacement-ligne" data-index="0">
+                <input type="text" class="ajout-input emplacement-nom" placeholder="Ex: Entrepôt A - Rayon 3">
+                <input type="number" class="ajout-input emplacement-qte" placeholder="Qté" min="0">
+                <button class="emplacement-supprimer" title="Supprimer" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"/>
+                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <button class="emplacement-ajouter-btn" id="btn-ajouter-emplacement">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"/>
+                <path d="M5 12h14"/>
+            </svg>
+            <span>Ajouter un emplacement</span>
+        </button>
+    </div>
+
+    <!-- QUANTITÉ TOTALE (calculée automatiquement) -->
+    <div class="ajout-champ">
+        <label class="ajout-champ-label">Quantité totale</label>
+        <div class="quantite-totale-affichage" id="quantite-totale-affichage">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span id="valeur-quantite-totale">0</span>
+            <span class="quantite-totale-unite">unité(s)</span>
+        </div>
+    </div>
+
+    <!-- QUANTITÉ MIN & MAX -->
+    <div class="ajout-ligne">
+        <div class="ajout-champ">
+            <label class="ajout-champ-label">Quantité min.</label>
+            <input type="number" class="ajout-input" id="input-qte-min" placeholder="0" min="0">
+        </div>
+        <div class="ajout-champ">
+            <label class="ajout-champ-label">Quantité max.</label>
+            <input type="number" class="ajout-input" id="input-qte-max" placeholder="0" min="0">
+        </div>
+    </div>
+
+    <div class="ajout-ligne">
+        <div class="ajout-champ">
+            <label class="ajout-champ-label">Prix d'achat unit.</label>
+            <input type="number" class="ajout-input" placeholder="0.00">
+        </div>
+        <div class="ajout-champ">
+            <label class="ajout-champ-label">Prix de vente unit.</label>
+            <input type="number" class="ajout-input" placeholder="0.00">
+        </div>
+    </div>
+    <div class="ajout-prix-section">
+        <div class="ajout-prix-ligne">
+            <span class="ajout-prix-label">Valeur totale d'achat</span>
+            <span class="ajout-prix-valeur">0.00 $</span>
+        </div>
+        <div class="ajout-prix-ligne">
+            <span class="ajout-prix-label">Valeur totale de vente</span>
+            <span class="ajout-prix-valeur">0.00 $</span>
+        </div>
+        <div class="ajout-prix-ligne">
+            <span class="ajout-prix-label">Bénéfice potentiel</span>
+            <span class="ajout-prix-valeur positif">0.00 $</span>
+        </div>
+        <div class="ajout-prix-ligne">
+            <span class="ajout-prix-label">Marge bénéficiaire</span>
+            <span class="ajout-prix-valeur positif">0%</span>
+        </div>
+    </div>
+    <div class="ajout-champ">
+        <label class="ajout-champ-label">Notes</label>
+        <textarea class="ajout-input" placeholder="Ajouter des notes..." style="min-height:80px"></textarea>
+    </div>
+    <button class="ajout-enregistrer-btn">Enregistrer le produit</button>
+</div>
+
+    </div>
+
+<!-- Navigation principale -->
+<nav class="nav-principale" id="nav-principale" style="display:none">
+    <button class="nav-item actif" data-ecran="ecran-accueil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Accueil</span>
+    </button>
+
+<button class="nav-item" data-ecran="ecran-produits">
+    <svg class="icone-produits" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" />
+        <path d="M7.5 3L3 8h18l-4.5-5z" />
+        <line x1="12" y1="3" x2="12" y2="8" />
+    </svg>
+    <span>Produits</span>
+</button>
+
+    <button class="nav-item" data-ecran="ecran-historique">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Historique</span>
+    </button>
+
+    <button class="nav-item" data-ecran="ecran-rapports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <line x1="10" y1="9" x2="8" y2="9"/>
+        </svg>
+        <span>Rapports</span>
+    </button>
+
+<button class="nav-item" data-ecran="ecran-menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="6" x2="20" y2="6"/>
+        <line x1="4" y1="18" x2="20" y2="18"/>
+    </svg>
+    <span>Menu</span>
+</button>
+</nav>
+
+<!-- Modal Mouvement -->
+<div class="modal-overlay" id="modal-mouvement">
+    <div class="modal-contenu-mouvement">
+        <!-- Poignée -->
+        <div class="poignee-mouvement"><span></span></div>
+
+        <!-- En-tête -->
+        <div class="entete-mouvement">
+            <div class="titre-zone-mouvement">
+                <div class="icone-titre-mouvement" id="icone-titre-mouvement">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+                </div>
+                <div>
+                    <h3 class="titre-mouvement" id="titre-mouvement">Entrée de stock</h3>
+                    <p class="sous-titre-mouvement" id="sous-titre-mouvement">Ajouter des unités au stock</p>
+                </div>
+            </div>
+            <button class="fermer-mouvement" id="fermer-mouvement">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Corps -->
+        <div class="corps-mouvement">
+
+            <!-- Étape indicateur -->
+            <div class="etapes-mouvement">
+                <div class="etape-mouvement active" data-etape="1"><span>1</span>Motif</div>
+                <div class="etape-ligne-mouvement"></div>
+                <div class="etape-mouvement" data-etape="2"><span>2</span>Détails</div>
+                <div class="etape-ligne-mouvement"></div>
+                <div class="etape-mouvement" data-etape="3"><span>3</span>Confirmer</div>
+            </div>
+
+            <!-- Section Motif -->
+            <div class="section-mouvement" id="section-motif-mouvement">
+                <label class="label-mouvement">Pourquoi ce mouvement ?</label>
+                <div class="grille-motifs-mouvement" id="grille-motifs-mouvement">
+                    <!-- Rempli par JS -->
+                </div>
+            </div>
+
+            <!-- Section Emplacement -->
+            <div class="section-mouvement" id="section-emplacement-mouvement">
+                <label class="label-mouvement">Emplacement concerné</label>
+                <div class="selecteur-mouvement" id="selecteur-emplacement-mouvement">
+                    <div class="selecteur-affiche-mouvement" id="affiche-emplacement-mouvement">
+                        <div class="emplacement-info-mouvement">
+                            <svg class="icone-emplacement-mouvement" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <div>
+                                <span class="emplacement-nom-mouvement">Entrepôt A — Rayon 3</span>
+                                <span class="emplacement-qty-mouvement">100 unités</span>
+                            </div>
+                        </div>
+                        <svg class="chevron-mouvement" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    <div class="selecteur-liste-mouvement" id="liste-emplacement-mouvement">
+                        <div class="selecteur-option-mouvement active" data-emplacement="entrepot-a" data-qty="100">
+                            <div class="option-emp-gauche-mouvement">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <div>
+                                    <span class="option-emp-nom-mouvement">Entrepôt A — Rayon 3</span>
+                                    <span class="option-emp-detail-mouvement">Zone de stockage principale</span>
+                                </div>
+                            </div>
+                            <span class="option-emp-badge-mouvement">100 u.</span>
+                        </div>
+                        <div class="selecteur-option-mouvement" data-emplacement="magasin-b" data-qty="56">
+                            <div class="option-emp-gauche-mouvement">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <div>
+                                    <span class="option-emp-nom-mouvement">Magasin — Étagère B2</span>
+                                    <span class="option-emp-detail-mouvement">Point de vente</span>
+                                </div>
+                            </div>
+                            <span class="option-emp-badge-mouvement">56 u.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Quantité -->
+            <div class="section-mouvement" id="section-quantite-mouvement">
+                <label class="label-mouvement" id="label-quantite-mouvement">Quantité à entrer</label>
+                <div class="champ-quantite-mouvement">
+                    <button class="btn-qty-mouvement" id="btn-moins-mouvement" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <input type="number" class="input-quantite-mouvement" id="input-quantite-mouvement" value="0" min="0">
+                    <button class="btn-qty-mouvement" id="btn-plus-mouvement" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section Résultat -->
+            <div class="section-mouvement" id="section-resultat-mouvement">
+                <label class="label-mouvement">Impact sur le stock global</label>
+                <div class="resultat-mouvement">
+                    <div class="resultat-bloc-mouvement">
+                        <span class="resultat-etiquette-mouvement">Avant</span>
+                        <span class="resultat-valeur-mouvement" id="resultat-avant-mouvement">156</span>
+                    </div>
+                    <div class="resultat-variation-mouvement" id="resultat-variation-mouvement">
+                        <span class="variation-badge-mouvement neutre" id="badge-variation-mouvement">0</span>
+                    </div>
+                    <div class="resultat-bloc-mouvement">
+                        <span class="resultat-etiquette-mouvement">Après</span>
+                        <span class="resultat-valeur-mouvement resultat-apres-mouvement" id="resultat-apres-mouvement">156</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Note -->
+            <div class="section-mouvement" id="section-note-mouvement">
+                <div class="label-ligne-mouvement">
+                    <label class="label-mouvement">Note <span class="optionnel-mouvement">(optionnel)</span></label>
+                    <span class="compteur-mouvement" id="compteur-note-mouvement">0 / 50</span>
+                </div>
+                <textarea class="textarea-mouvement" id="textarea-note-mouvement" placeholder="Ex : Livraison reçue ce matin..." maxlength="50" rows="2"></textarea>
+            </div>
+
+            <!-- Bouton Valider -->
+            <button type="button" class="btn-valider-mouvement" id="btn-valider-mouvement">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <span id="btn-valider-texte-mouvement">Confirmer l'entrée</span>
+            </button>
+
+        </div>
+    </div>
+</div>
+    
+    <!-- Modale ajout catégorie -->
+<div class="modale-superposition" id="modale-categorie">
+    <div class="modale-contenu">
+        <h3 class="modale-titre">Nouvelle catégorie</h3>
+        <input type="text" class="modale-input" id="input-nouvelle-categorie" placeholder="Nom de la catégorie">
+        <div class="modale-actions">
+            <button class="modale-btn-annuler" id="btn-annuler-categorie">Annuler</button>
+            <button class="modale-btn-confirmer" id="btn-confirmer-categorie">Ajouter</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== INTERFACE CAMÉRA PLEIN ÉCRAN ========== -->
+<div class="superposition-camera-photo-produit" id="superposition-camera-photo-produit">
+    <video class="flux-camera-photo-produit" id="flux-camera-photo-produit" autoplay playsinline></video>
+    <canvas class="canvas-capture-photo-produit" id="canvas-capture-photo-produit"></canvas>
+    
+    <button class="btn-fermer-camera-photo-produit" id="btn-fermer-camera-photo-produit">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+        </svg>
+    </button>
+
+    <div class="controles-camera-photo-produit">
+        <button class="btn-action-camera-photo-produit" id="btn-galerie-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+            <span>Galerie</span>
+        </button>
+
+        <button class="btn-declencheur-photo-produit" id="btn-declencheur-photo-produit">
+            <div class="cercle-declencheur-photo-produit"></div>
+        </button>
+
+        <button class="btn-action-camera-photo-produit" id="btn-torche-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                <path d="M9 18h6"/>
+                <path d="M10 22h4"/>
+            </svg>
+            <span>Torche</span>
+        </button>
+    </div>
+
+    <input type="file" accept="image/*" id="input-galerie-photo-produit" style="display:none;">
+</div>
+
+<!-- ========== INTERFACE DE VALIDATION ========== -->
+<div class="superposition-validation-photo-produit" id="superposition-validation-photo-produit">
+    <div class="conteneur-apercu-photo-produit">
+        <img class="image-apercu-photo-produit" id="image-apercu-photo-produit" alt="Aperçu">
+    </div>
+
+    <div class="actions-validation-photo-produit">
+        <button class="btn-annuler-validation-photo-produit" id="btn-annuler-validation-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18"/>
+                <path d="m6 6 12 12"/>
+            </svg>
+            <span>Reprendre</span>
+        </button>
+        <button class="btn-confirmer-validation-photo-produit" id="btn-confirmer-validation-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Utiliser cette photo</span>
+        </button>
+    </div>
+</div>
+
+<!-- ========== INTERFACE DE ROGNAGE ========== -->
+<div class="superposition-rognage-photo-produit" id="superposition-rognage-photo-produit">
+    <div class="entete-rognage-photo-produit">
+        <button class="btn-retour-rognage-photo-produit" id="btn-retour-rognage-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+        </button>
+        <div class="titre-rognage-photo-produit">
+            <h3>Cadrer le produit</h3>
+            <p>Ajustez le cadre pour isoler votre produit et obtenir un visuel net et précis.</p>
+        </div>
+    </div>
+
+    <div class="zone-rognage-photo-produit" id="zone-rognage-photo-produit">
+        <img class="image-rognage-photo-produit" id="image-rognage-photo-produit" alt="Rognage">
+        <div class="cadre-rognage-photo-produit" id="cadre-rognage-photo-produit">
+            <div class="poignee-rognage-photo-produit haut-gauche" data-direction="haut-gauche"></div>
+            <div class="poignee-rognage-photo-produit haut" data-direction="haut"></div>
+            <div class="poignee-rognage-photo-produit haut-droite" data-direction="haut-droite"></div>
+            <div class="poignee-rognage-photo-produit gauche" data-direction="gauche"></div>
+            <div class="poignee-rognage-photo-produit droite" data-direction="droite"></div>
+            <div class="poignee-rognage-photo-produit bas-gauche" data-direction="bas-gauche"></div>
+            <div class="poignee-rognage-photo-produit bas" data-direction="bas"></div>
+            <div class="poignee-rognage-photo-produit bas-droite" data-direction="bas-droite"></div>
+        </div>
+        <div class="masque-rognage-haut-photo-produit masque-rognage-photo-produit" id="masque-haut-photo-produit"></div>
+        <div class="masque-rognage-bas-photo-produit masque-rognage-photo-produit" id="masque-bas-photo-produit"></div>
+        <div class="masque-rognage-gauche-photo-produit masque-rognage-photo-produit" id="masque-gauche-photo-produit"></div>
+        <div class="masque-rognage-droite-photo-produit masque-rognage-photo-produit" id="masque-droite-photo-produit"></div>
+    </div>
+
+    <div class="actions-rognage-photo-produit">
+        <button class="btn-reinitialiser-rognage-photo-produit" id="btn-reinitialiser-rognage-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+            </svg>
+            <span>Réinitialiser</span>
+        </button>
+        <button class="btn-valider-rognage-photo-produit" id="btn-valider-rognage-photo-produit">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Valider le cadrage</span>
+        </button>
+    </div>
+</div>
+
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="overlay-entreprise" id="overlay-entreprise"></div>
+
+    <!-- ===== BOTTOM-SHEET : INVITER UN UTILISATEUR (choix de rôle) ===== -->
+    <div class="panneau-entreprise" id="panneau-invitation-entreprise">
+        <div class="poignee-panneau-entreprise"><span></span></div>
+        <div class="entete-panneau-entreprise">
+            <div class="titre-panneau-entreprise">Inviter un membre</div>
+            <div class="sous-titre-panneau-entreprise">Sélectionnez le rôle à attribuer</div>
+        </div>
+        <div class="corps-panneau-entreprise">
+
+            <!-- Administrateur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="administrateur">
+                <div class="icone-role-entreprise role-administrateur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Administrateur</div>
+                    <div class="desc-role-entreprise">Contrôle total sur l'application, les membres et les paramètres système.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Tout</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Éditeur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="editeur">
+                <div class="icone-role-entreprise role-editeur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Éditeur</div>
+                    <div class="desc-role-entreprise">Gère le catalogue produits et l'ensemble des mouvements de stock.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Créer</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Modifier</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/></svg>Entrée</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Sortie</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>Inventaire</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Coordinateur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="coordinateur">
+                <div class="icone-role-entreprise role-coordinateur-entreprise">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Coordinateur</div>
+                    <div class="desc-role-entreprise">Supervise les flux de stock et effectue les corrections d'inventaire.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/></svg>Entrée</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Sortie</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>Inventaire</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Auditeur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="auditeur">
+                <div class="icone-role-entreprise role-auditeur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Auditeur</div>
+                    <div class="desc-role-entreprise">Vérifie et ajuste les niveaux de stock via l'inventaire correctif.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>Inventaire</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+            <!-- Opérateur -->
+            <div class="carte-role-entreprise" data-role-invitation-entreprise="operateur">
+                <div class="icone-role-entreprise role-operateur-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                </div>
+                <div class="details-role-entreprise">
+                    <div class="nom-role-entreprise">Opérateur</div>
+                    <div class="desc-role-entreprise">Enregistre les mouvements d'entrée et de sortie de marchandises.</div>
+                    <div class="tags-role-entreprise">
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/></svg>Entrée</span>
+                        <span class="tag-action-entreprise"><svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Sortie</span>
+                    </div>
+                </div>
+                <svg class="fleche-role-entreprise" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== BOTTOM-SHEET : PROFIL UTILISATEUR ===== -->
+    <div class="panneau-entreprise" id="panneau-profil-utilisateur-entreprise">
+        <div class="poignee-panneau-entreprise"><span></span></div>
+        <div class="corps-panneau-entreprise">
+
+            <!-- Profil -->
+            <div class="profil-panneau-entreprise">
+                <div class="avatar-profil-panneau-entreprise" id="avatar-panneau-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="nom-profil-panneau-entreprise" id="nom-panneau-entreprise">—</div>
+                <div class="email-profil-panneau-entreprise" id="email-panneau-entreprise">—</div>
+            </div>
+
+            <!-- Zone rôles -->
+            <div class="zone-roles-panneau-entreprise">
+                <div class="label-roles-panneau-entreprise">Rôle</div>
+                <div class="tags-roles-panneau-entreprise" id="tags-roles-panneau-entreprise">
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="administrateur">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                        Admin
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="editeur">
+                        <svg viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+                        Éditeur
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="coordinateur">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                        Coord.
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="auditeur">
+                        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+                        Auditeur
+                    </button>
+                    <button class="tag-role-panneau-entreprise" data-tag-role-entreprise="operateur">
+                        <svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        Opérateur
+                    </button>
+                </div>
+            </div>
+
+            <!-- Description dynamique -->
+            <div class="description-role-panneau-entreprise" id="description-role-panneau-entreprise">
+                Sélectionnez un rôle pour voir les permissions associées.
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-profil-panneau-entreprise">
+                <button class="btn-modifier-role-entreprise" id="btn-modifier-role-entreprise" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    Modifier le rôle
+                </button>
+                <button class="btn-retirer-membre-entreprise" id="btn-retirer-membre-entreprise">
+                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="11" x2="22" y2="11"/></svg>
+                    Retirer de l'équipe
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== QR CODE PLEIN ÉCRAN ===== -->
+    <div class="qr-plein-ecran-entreprise" id="qr-plein-ecran-entreprise">
+        <div class="entete-qr-entreprise">
+            <button class="btn-fermer-qr-entreprise" id="btn-fermer-qr-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <button class="btn-exporter-qr-entreprise" id="btn-exporter-qr-entreprise">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exporter
+            </button>
+        </div>
+        <div class="contenu-qr-entreprise">
+            <p class="invitation-qr-entreprise" id="invitation-qr-entreprise">Mon Entreprise vous invite à rejoindre l'équipe en tant que</p>
+            <div class="carte-qr-entreprise">
+                <div id="qrcode-entreprise"></div>
+                <div class="infos-qr-entreprise">
+                    <div class="nom-entreprise-qr" id="nom-entreprise-qr">Mon Entreprise</div>
+                    <div class="role-qr-entreprise" id="role-qr-entreprise">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span id="nom-role-qr-entreprise">Opérateur</span>
+                    </div>
+                </div>
+            </div>
+            <p class="instructions-qr-entreprise">
+                <strong>Comment utiliser ce QR code</strong>
+                L'invité doit scanner ce code avec l'application pour rejoindre automatiquement l'entreprise. Vous pouvez également exporter cette image et la lui envoyer par message — il pourra alors l'importer dans l'application.
+            </p>
+        </div>
+    </div>
+    
+    <!-- ===== SCANNER QR CODE PLEIN ÉCRAN ===== -->
+<div class="scanner-qr-entreprise" id="scanner-qr-entreprise">
+    <!-- Flux caméra en arrière-plan -->
+    <video class="scanner-qr-video" id="scanner-qr-video" autoplay playsinline></video>
+
+    <!-- Overlay sombre avec découpe centrale -->
+    <div class="scanner-qr-overlay">
+        <!-- En-tête -->
+        <div class="scanner-qr-entete">
+            <button class="scanner-qr-btn-fermer" id="scanner-qr-btn-fermer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <span class="scanner-qr-titre-entete">Scanner une invitation</span>
+            <div style="width:40px"></div>
+        </div>
+
+        <!-- Zone centrale : texte + cadre -->
+        <div class="scanner-qr-centre">
+            <p class="scanner-qr-instruction">Placez le QR code d'invitation dans le cadre pour le scanner automatiquement</p>
+
+            <!-- Cadre de scan avec coins animés -->
+            <div class="scanner-qr-cadre">
+                <div class="scanner-qr-coin scanner-qr-coin-hg"></div>
+                <div class="scanner-qr-coin scanner-qr-coin-hd"></div>
+                <div class="scanner-qr-coin scanner-qr-coin-bg"></div>
+                <div class="scanner-qr-coin scanner-qr-coin-bd"></div>
+                <!-- Ligne de scan animée -->
+                <div class="scanner-qr-ligne" id="scanner-qr-ligne"></div>
+            </div>
+
+            <p class="scanner-qr-sous-instruction">Le scan est automatique, aucune action requise</p>
+        </div>
+
+        <!-- Barre d'actions en bas -->
+        <div class="scanner-qr-actions">
+            <button class="scanner-qr-action-btn" id="scanner-qr-btn-galerie">
+                <div class="scanner-qr-action-icone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </div>
+                <span class="scanner-qr-action-label">Galerie</span>
+            </button>
+
+            <button class="scanner-qr-action-btn scanner-qr-btn-torche" id="scanner-qr-btn-torche">
+                <div class="scanner-qr-action-icone" id="scanner-qr-icone-torche">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                        <path d="M12 2v1"/>
+                        <path d="M4.93 4.93l.7.7"/>
+                        <path d="M19.07 4.93l-.7.7"/>
+                        <path d="M2 12h1"/>
+                        <path d="M21 12h1"/>
+                        <path d="M15 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        <path d="M9 12a3 3 0 0 0 3 3 3 3 0 0 0 3-3"/>
+                    </svg>
+                </div>
+                <span class="scanner-qr-action-label">Torche</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Input caché pour import image depuis galerie -->
+    <input type="file" id="scanner-qr-input-galerie" accept="image/*" style="display:none" />
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="libs/qrcode.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
