@@ -1,0 +1,53 @@
+{
+  "general": {
+    "appNom": "StockMvt",
+    "version": "StockMvt v1.0.0",
+    "continuer": "जारी रखें",
+    "suivant": "अगला",
+    "commencer": "शुरू करें",
+    "valider": "मान्य करें",
+    "enregistrer": "सहेजें",
+    "annuler": "रद्द करें",
+    "ajouter": "जोड़ें",
+    "modifier": "संशोधित करें",
+    "supprimer": "हटाएं",
+    "confirmer": "पुष्टि करें",
+    "appliquer": "लागू करें",
+    "reinitialiser": "रीसेट करें",
+    "fermer": "बंद करें",
+    "retour": "वापस",
+    "rechercher": "खोजें...",
+    "aucunResultat": "कोई परिणाम नहीं",
+    "chargement": "लोड हो रहा है...",
+    "traitement": "प्रोसेसिंग...",
+    "oui": "हाँ",
+    "non": "नहीं",
+    "ou": "या",
+    "et": "और",
+    "de": "का",
+    "a": "को",
+    "le": "का",
+    "du": "से",
+    "au": "तक",
+    "articles": "आइटम",
+    "unites": "इकाइयाँ",
+    "unite": "इकाई"
+  },
+  "nav": {
+    "accueil": "होम",
+    "produits": "उत्पाद",
+    "historique": "इतिहास",
+    "rapports": "रिपोर्ट",
+    "menu": "मेनू"
+  },
+  "feuilleLangue": {
+    "titre": "भाषा चुनें",
+    "langues": {
+      "fr": "Français",
+      "en": "English",
+      "hi": "हिन्दी",
+      "ln": "Lingala",
+      "sw": "Swahili"
+    }
+  }
+}
