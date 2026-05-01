@@ -5833,6 +5833,670 @@ $$;
 GRANT EXECUTE ON FUNCTION public.supprimer_compte_utilisateur() TO authenticated;
 */
 
--- ================================
--- PARTIE 52
--- ================================
+-- ================================================================
+-- PARTIE 52 — AUTOMATISATION COMPLÈTE POUR GARDER LA BASE ACTIVE
+-- ================================================================
+
+-- ================================================================
+-- ÉTAPE 1 : Activer l'extension pg_cron (si pas déjà fait)
+-- ================================================================
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- ================================================================
+-- ÉTAPE 2 : Table de suivi des simulations automatiques
+-- ================================================================
+CREATE TABLE IF NOT EXISTS public.simulation_log (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    action TEXT NOT NULL,
+    details TEXT,
+    cree_le TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Pas de RLS sur cette table (c'est une table système interne)
+ALTER TABLE public.simulation_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Lecture simulation pour membres authentifiés"
+ON public.simulation_log FOR SELECT
+TO authenticated
+USING (true);
+
+-- ================================================================
+-- ÉTAPE 3 : Fonction utilitaire — obtenir ou créer le profil bot
+-- Cette fonction crée un profil "système" dans la table profils
+-- en utilisant l'ID d'un utilisateur réel (toi)
+-- ================================================================
+CREATE OR REPLACE FUNCTION public.obtenir_id_utilisateur_simulation()
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_uid UUID;
+BEGIN
+    -- Chercher ton profil par email
+    SELECT id INTO v_uid
+    FROM public.profils
+    WHERE email = 'jeanlouislikulabasomboli@gmail.com'
+    LIMIT 1;
+
+    -- Si trouvé, retourner l'ID
+    IF v_uid IS NOT NULL THEN
+        RETURN v_uid;
+    END IF;
+
+    -- Si pas encore de profil, chercher dans auth.users
+    SELECT id INTO v_uid
+    FROM auth.users
+    WHERE email = 'jeanlouislikulabasomboli@gmail.com'
+    LIMIT 1;
+
+    IF v_uid IS NOT NULL THEN
+        RETURN v_uid;
+    END IF;
+
+    -- Aucun utilisateur trouvé — on prend le premier profil existant
+    SELECT id INTO v_uid
+    FROM public.profils
+    LIMIT 1;
+
+    RETURN v_uid;
+END;
+$$;
+
+-- ================================================================
+-- ÉTAPE 4 : Fonction principale — obtenir ou créer l'entreprise de simulation
+-- ================================================================
+CREATE OR REPLACE FUNCTION public.obtenir_entreprise_simulation()
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_eid UUID;
+    v_uid UUID;
+BEGIN
+    -- Chercher l'entreprise de simulation existante
+    SELECT id INTO v_eid
+    FROM public.entreprises
+    WHERE nom = 'Entreprise Auto-Simulation'
+    LIMIT 1;
+
+    IF v_eid IS NOT NULL THEN
+        RETURN v_eid;
+    END IF;
+
+    -- Créer l'entreprise de simulation
+    v_uid := public.obtenir_id_utilisateur_simulation();
+
+    IF v_uid IS NULL THEN
+        -- Log et sortir si aucun utilisateur
+        INSERT INTO public.simulation_log (action, details)
+        VALUES ('ERREUR', 'Aucun utilisateur trouvé pour la simulation');
+        RETURN NULL;
+    END IF;
+
+    INSERT INTO public.entreprises (
+        nom, description, devise, theme, logo_url, cree_par
+    )
+    VALUES (
+        'Entreprise Auto-Simulation',
+        'Entreprise automatique pour maintenir la base active. Gestion simulée de produits, mouvements et inventaires.',
+        'USD',
+        '#0984e3',
+        NULL,
+        v_uid
+    )
+    RETURNING id INTO v_eid;
+
+    -- Ajouter l'utilisateur comme administrateur
+    INSERT INTO public.membres_entreprise (entreprise_id, utilisateur_id, role)
+    VALUES (v_eid, v_uid, 'administrateur')
+    ON CONFLICT (entreprise_id, utilisateur_id) DO NOTHING;
+
+    -- Mettre l'entreprise comme active pour le profil
+    UPDATE public.profils
+    SET entreprise_active_id = COALESCE(entreprise_active_id, v_eid)
+    WHERE id = v_uid;
+
+    INSERT INTO public.simulation_log (action, details)
+    VALUES ('CREATION_ENTREPRISE', 'Entreprise Auto-Simulation créée avec ID : ' || v_eid::TEXT);
+
+    RETURN v_eid;
+END;
+$$;
+
+-- ================================================================
+-- ÉTAPE 5 : Fonction — s'assurer qu'il y a des catégories
+-- ================================================================
+CREATE OR REPLACE FUNCTION public.assurer_categories_simulation(p_entreprise_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_count INTEGER;
+    v_noms TEXT[] := ARRAY[
+        'Électronique', 'Alimentation', 'Bureautique',
+        'Vêtements', 'Quincaillerie', 'Hygiène',
+        'Boissons', 'Fournitures'
+    ];
+    v_slugs TEXT[] := ARRAY[
+        'electronique', 'alimentation', 'bureautique',
+        'vetements', 'quincaillerie', 'hygiene',
+        'boissons', 'fournitures'
+    ];
+    i INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM public.categories
+    WHERE entreprise_id = p_entreprise_id;
+
+    IF v_count >= 4 THEN
+        RETURN;
+    END IF;
+
+    FOR i IN 1..array_length(v_noms, 1) LOOP
+        INSERT INTO public.categories (entreprise_id, nom, slug)
+        VALUES (p_entreprise_id, v_noms[i], v_slugs[i])
+        ON CONFLICT (entreprise_id, slug) DO NOTHING;
+    END LOOP;
+
+    INSERT INTO public.simulation_log (action, details)
+    VALUES ('CREATION_CATEGORIES', 'Catégories de simulation créées pour entreprise ' || p_entreprise_id::TEXT);
+END;
+$$;
+
+-- ================================================================
+-- ÉTAPE 6 : Fonction — s'assurer qu'il y a des produits
+-- ================================================================
+CREATE OR REPLACE FUNCTION public.assurer_produits_simulation(p_entreprise_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_count INTEGER;
+    v_cat_id UUID;
+    v_produit_id UUID;
+    v_noms TEXT[] := ARRAY[
+        'Cahier A4 96 pages', 'Stylo bleu Bic', 'Riz Basmati 5kg',
+        'Savon Palmolive', 'Câble USB-C 1m', 'Eau minérale 1.5L',
+        'T-shirt blanc XL', 'Clou 5cm (boîte)', 'Pile AA (pack 4)',
+        'Huile de palme 1L', 'Farine de blé 2kg', 'Sac poubelle 50L',
+        'Classeur à levier', 'Ampoule LED 9W', 'Scotch transparent'
+    ];
+    v_cats TEXT[] := ARRAY[
+        'bureautique', 'bureautique', 'alimentation',
+        'hygiene', 'electronique', 'boissons',
+        'vetements', 'quincaillerie', 'electronique',
+        'alimentation', 'alimentation', 'fournitures',
+        'bureautique', 'electronique', 'fournitures'
+    ];
+    v_prix_achats NUMERIC[] := ARRAY[
+        1.50, 0.30, 8.00,
+        1.20, 3.50, 0.80,
+        5.00, 2.00, 2.50,
+        3.00, 2.50, 1.80,
+        3.00, 2.00, 1.00
+    ];
+    v_prix_ventes NUMERIC[] := ARRAY[
+        2.50, 0.50, 12.00,
+        2.00, 6.00, 1.50,
+        8.00, 3.50, 4.00,
+        5.00, 4.00, 3.00,
+        5.00, 3.50, 1.80
+    ];
+    v_qtts INTEGER[] := ARRAY[
+        50, 200, 30,
+        80, 25, 100,
+        40, 150, 60,
+        45, 35, 70,
+        20, 55, 90
+    ];
+    i INTEGER;
+    v_statut TEXT;
+    v_qmin INTEGER;
+    v_qmax INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM public.produits
+    WHERE entreprise_id = p_entreprise_id;
+
+    IF v_count >= 10 THEN
+        RETURN;
+    END IF;
+
+    FOR i IN 1..array_length(v_noms, 1) LOOP
+        -- Trouver la catégorie
+        SELECT id INTO v_cat_id
+        FROM public.categories
+        WHERE entreprise_id = p_entreprise_id
+        AND slug = v_cats[i]
+        LIMIT 1;
+
+        v_qmin := GREATEST(5, (v_qtts[i] * 0.2)::INTEGER);
+        v_qmax := (v_qtts[i] * 2.5)::INTEGER;
+
+        -- Calculer le statut
+        IF v_qtts[i] <= 0 THEN
+            v_statut := 'nul';
+        ELSIF v_qtts[i] < v_qmin THEN
+            v_statut := 'faible';
+        ELSIF v_qtts[i] > v_qmax THEN
+            v_statut := 'eleve';
+        ELSE
+            v_statut := 'normal';
+        END IF;
+
+        -- Vérifier si le produit existe déjà
+        IF NOT EXISTS (
+            SELECT 1 FROM public.produits
+            WHERE entreprise_id = p_entreprise_id AND nom = v_noms[i]
+        ) THEN
+            INSERT INTO public.produits (
+                entreprise_id, nom, code, categorie_id,
+                quantite_totale, quantite_min, quantite_max,
+                prix_achat, prix_vente, statut
+            )
+            VALUES (
+                p_entreprise_id, v_noms[i],
+                'SIM-' || LPAD(i::TEXT, 3, '0'),
+                v_cat_id,
+                v_qtts[i], v_qmin, v_qmax,
+                v_prix_achats[i], v_prix_ventes[i], v_statut
+            )
+            RETURNING id INTO v_produit_id;
+
+            -- Créer 2 emplacements par produit
+            INSERT INTO public.emplacements_produit (produit_id, nom, quantite)
+            VALUES
+                (v_produit_id, 'Entrepôt principal', (v_qtts[i] * 0.7)::INTEGER),
+                (v_produit_id, 'Magasin vitrine', v_qtts[i] - (v_qtts[i] * 0.7)::INTEGER);
+        END IF;
+    END LOOP;
+
+    INSERT INTO public.simulation_log (action, details)
+    VALUES ('CREATION_PRODUITS', 'Produits de simulation créés pour entreprise ' || p_entreprise_id::TEXT);
+END;
+$$;
+
+-- ================================================================
+-- ÉTAPE 7 : Fonction principale de simulation d'activité
+-- C'est elle qui sera appelée par pg_cron
+-- Elle simule des opérations réalistes à chaque exécution
+-- ================================================================
+CREATE OR REPLACE FUNCTION public.simuler_activite_entreprise()
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_eid UUID;
+    v_uid UUID;
+    v_uid_nom TEXT;
+    v_produit RECORD;
+    v_emplacement RECORD;
+    v_action INTEGER;
+    v_quantite INTEGER;
+    v_ancien_statut TEXT;
+    v_nouveau_statut TEXT;
+    v_stock_avant INTEGER;
+    v_stock_apres INTEGER;
+    v_emp_avant INTEGER;
+    v_emp_apres INTEGER;
+    v_diff INTEGER;
+    v_motifs_entree TEXT[] := ARRAY['Achat', 'Production', 'Retour client'];
+    v_motifs_sortie TEXT[] := ARRAY['Vente', 'Usage interne', 'Casse'];
+    v_motif TEXT;
+    v_nb_operations INTEGER := 0;
+    v_details TEXT := '';
+    v_nouveau_nom TEXT;
+    v_nouveau_prix NUMERIC;
+    v_compteur INTEGER;
+    v_cat_id UUID;
+BEGIN
+    -- 1) Obtenir ou créer l'entreprise de simulation
+    v_eid := public.obtenir_entreprise_simulation();
+    IF v_eid IS NULL THEN
+        RETURN;
+    END IF;
+
+    -- 2) Obtenir l'utilisateur
+    v_uid := public.obtenir_id_utilisateur_simulation();
+    IF v_uid IS NULL THEN
+        INSERT INTO public.simulation_log (action, details)
+        VALUES ('ERREUR', 'Aucun utilisateur disponible pour la simulation');
+        RETURN;
+    END IF;
+
+    v_uid_nom := COALESCE(
+        (SELECT nom_complet FROM public.profils WHERE id = v_uid),
+        'Système Auto'
+    );
+
+    -- 3) S'assurer qu'on a des catégories et produits
+    PERFORM public.assurer_categories_simulation(v_eid);
+    PERFORM public.assurer_produits_simulation(v_eid);
+
+    -- ================================================
+    -- OPÉRATION A : Mouvements de stock (3 à 6 opérations)
+    -- ================================================
+    FOR v_produit IN
+        SELECT p.id, p.nom, p.quantite_totale, p.quantite_min, p.quantite_max, p.statut
+        FROM public.produits p
+        WHERE p.entreprise_id = v_eid
+        ORDER BY random()
+        LIMIT 3 + (random() * 3)::INTEGER
+    LOOP
+        -- Choisir un emplacement aléatoire du produit
+        SELECT * INTO v_emplacement
+        FROM public.emplacements_produit
+        WHERE produit_id = v_produit.id
+        ORDER BY random()
+        LIMIT 1;
+
+        IF v_emplacement IS NULL THEN
+            -- Créer un emplacement s'il n'en existe pas
+            INSERT INTO public.emplacements_produit (produit_id, nom, quantite)
+            VALUES (v_produit.id, 'Stock général', GREATEST(v_produit.quantite_totale, 0))
+            RETURNING * INTO v_emplacement;
+        END IF;
+
+        -- Décider du type d'action : 1=entrée, 2=sortie, 3=inventaire
+        v_action := 1 + (random() * 2)::INTEGER;
+
+        v_stock_avant := v_produit.quantite_totale;
+        v_emp_avant := v_emplacement.quantite;
+        v_ancien_statut := v_produit.statut;
+
+        IF v_action = 1 THEN
+            -- ENTRÉE
+            v_quantite := 5 + (random() * 30)::INTEGER;
+            v_motif := v_motifs_entree[1 + (random() * (array_length(v_motifs_entree, 1) - 1))::INTEGER];
+            v_emp_apres := v_emp_avant + v_quantite;
+            v_diff := v_quantite;
+
+        ELSIF v_action = 2 THEN
+            -- SORTIE
+            v_quantite := LEAST(1 + (random() * 15)::INTEGER, v_emplacement.quantite);
+            IF v_quantite <= 0 THEN
+                v_quantite := 1;
+                v_action := 1; -- Convertir en entrée si stock vide
+                v_motif := 'Achat';
+                v_emp_apres := v_emp_avant + v_quantite;
+                v_diff := v_quantite;
+            ELSE
+                v_motif := v_motifs_sortie[1 + (random() * (array_length(v_motifs_sortie, 1) - 1))::INTEGER];
+                v_emp_apres := v_emp_avant - v_quantite;
+                v_diff := -v_quantite;
+            END IF;
+
+        ELSE
+            -- INVENTAIRE
+            v_quantite := GREATEST(0, v_emp_avant + (-5 + (random() * 10)::INTEGER));
+            v_diff := v_quantite - v_emp_avant;
+            v_emp_apres := v_quantite;
+            v_motif := 'Comptage périodique';
+        END IF;
+
+        v_stock_apres := GREATEST(0, v_stock_avant + v_diff);
+
+        -- Mettre à jour l'emplacement
+        UPDATE public.emplacements_produit
+        SET quantite = v_emp_apres
+        WHERE id = v_emplacement.id;
+
+        -- Calculer le nouveau statut
+        IF v_stock_apres <= 0 THEN
+            v_nouveau_statut := 'nul';
+        ELSIF v_produit.quantite_min > 0 AND v_stock_apres < v_produit.quantite_min THEN
+            v_nouveau_statut := 'faible';
+        ELSIF v_produit.quantite_max > 0 AND v_stock_apres > v_produit.quantite_max THEN
+            v_nouveau_statut := 'eleve';
+        ELSE
+            v_nouveau_statut := 'normal';
+        END IF;
+
+        -- Mettre à jour le produit
+        UPDATE public.produits
+        SET quantite_totale = v_stock_apres,
+            statut = v_nouveau_statut,
+            modifie_le = NOW()
+        WHERE id = v_produit.id;
+
+        -- Enregistrer le mouvement dans l'historique
+        INSERT INTO public.mouvements_stock (
+            entreprise_id, produit_id, emplacement_id,
+            type_mouvement, motif, quantite,
+            stock_avant_global, stock_apres_global,
+            stock_avant_emplacement, stock_apres_emplacement,
+            note, utilisateur_id, utilisateur_nom,
+            produit_nom, emplacement_nom
+        )
+        VALUES (
+            v_eid, v_produit.id, v_emplacement.id,
+            CASE WHEN v_action = 1 THEN 'entree'
+                 WHEN v_action = 2 THEN 'sortie'
+                 ELSE 'inventaire' END,
+            v_motif, v_quantite,
+            v_stock_avant, v_stock_apres,
+            v_emp_avant, v_emp_apres,
+            'Mouvement automatique de simulation',
+            v_uid, v_uid_nom,
+            v_produit.nom, v_emplacement.nom
+        );
+
+        -- Gérer les notifications si statut a changé
+        IF v_ancien_statut IS DISTINCT FROM v_nouveau_statut THEN
+            PERFORM public.gerer_notification_stock(
+                v_produit.id, v_eid,
+                v_ancien_statut, v_nouveau_statut,
+                v_stock_apres, v_produit.quantite_min, v_produit.quantite_max, v_produit.nom
+            );
+        ELSIF v_nouveau_statut IN ('nul', 'faible', 'eleve') THEN
+            UPDATE public.notifications_stock
+            SET quantite_actuelle = v_stock_apres
+            WHERE produit_id = v_produit.id AND active = TRUE;
+        END IF;
+
+        v_nb_operations := v_nb_operations + 1;
+    END LOOP;
+
+    -- ================================================
+    -- OPÉRATION B : Modifier un produit aléatoire (prix, nom secondaire)
+    -- ================================================
+    SELECT p.id, p.prix_vente, p.prix_achat, p.nom INTO v_produit
+    FROM public.produits p
+    WHERE p.entreprise_id = v_eid
+    ORDER BY random()
+    LIMIT 1;
+
+    IF v_produit IS NOT NULL THEN
+        -- Ajuster légèrement le prix de vente (±10%)
+        v_nouveau_prix := ROUND((v_produit.prix_vente * (0.9 + random() * 0.2))::NUMERIC, 2);
+
+        UPDATE public.produits
+        SET prix_vente = v_nouveau_prix,
+            modifie_le = NOW(),
+            notes = 'Dernière mise à jour automatique : ' || to_char(NOW(), 'DD/MM/YYYY à HH24:MI')
+        WHERE id = v_produit.id;
+
+        v_nb_operations := v_nb_operations + 1;
+    END IF;
+
+    -- ================================================
+    -- OPÉRATION C : Parfois ajouter puis supprimer un produit temporaire
+    -- (simule un cycle de vie complet)
+    -- ================================================
+    IF random() > 0.5 THEN
+        SELECT id INTO v_cat_id
+        FROM public.categories
+        WHERE entreprise_id = v_eid
+        ORDER BY random()
+        LIMIT 1;
+
+        v_nouveau_nom := 'Produit temporaire ' || to_char(NOW(), 'YYYYMMDD-HH24MI');
+
+        INSERT INTO public.produits (
+            entreprise_id, nom, code, categorie_id,
+            quantite_totale, quantite_min, quantite_max,
+            prix_achat, prix_vente, statut,
+            notes
+        )
+        VALUES (
+            v_eid, v_nouveau_nom,
+            'TMP-' || LPAD((random() * 999)::INTEGER::TEXT, 3, '0'),
+            v_cat_id,
+            10, 2, 50,
+            1.00, 2.00, 'normal',
+            'Produit créé automatiquement pour simulation'
+        )
+        RETURNING id INTO v_produit;
+
+        -- Créer un emplacement
+        INSERT INTO public.emplacements_produit (produit_id, nom, quantite)
+        VALUES (v_produit.id, 'Stock temporaire', 10);
+
+        v_nb_operations := v_nb_operations + 1;
+
+        -- Supprimer les anciens produits temporaires (garder max 3)
+        v_compteur := (
+            SELECT COUNT(*) FROM public.produits
+            WHERE entreprise_id = v_eid
+            AND nom LIKE 'Produit temporaire %'
+        );
+
+        IF v_compteur > 3 THEN
+            DELETE FROM public.produits
+            WHERE id IN (
+                SELECT p2.id FROM public.produits p2
+                WHERE p2.entreprise_id = v_eid
+                AND p2.nom LIKE 'Produit temporaire %'
+                ORDER BY p2.cree_le ASC
+                LIMIT v_compteur - 3
+            );
+            v_nb_operations := v_nb_operations + 1;
+        END IF;
+    END IF;
+
+    -- ================================================
+    -- OPÉRATION D : Lecture intensive (SELECT) pour marquer l'activité
+    -- ================================================
+    -- Lire les produits
+    PERFORM COUNT(*) FROM public.produits WHERE entreprise_id = v_eid;
+    -- Lire les mouvements
+    PERFORM COUNT(*) FROM public.mouvements_stock WHERE entreprise_id = v_eid;
+    -- Lire les notifications
+    PERFORM COUNT(*) FROM public.notifications_stock WHERE entreprise_id = v_eid AND active = TRUE;
+    -- Lire les membres
+    PERFORM COUNT(*) FROM public.membres_entreprise WHERE entreprise_id = v_eid;
+    -- Lire les catégories
+    PERFORM COUNT(*) FROM public.categories WHERE entreprise_id = v_eid;
+
+    -- ================================================
+    -- OPÉRATION E : Nettoyage des vieux logs (garder 90 jours)
+    -- ================================================
+    DELETE FROM public.simulation_log
+    WHERE cree_le < NOW() - INTERVAL '90 days';
+
+    DELETE FROM public.mouvements_stock
+    WHERE entreprise_id = v_eid
+    AND cree_le < NOW() - INTERVAL '90 days';
+
+    -- ================================================
+    -- LOG FINAL
+    -- ================================================
+    v_details := 'Simulation terminée avec succès. '
+        || v_nb_operations::TEXT || ' opérations effectuées. '
+        || 'Date : ' || to_char(NOW(), 'DD/MM/YYYY à HH24:MI:SS');
+
+    INSERT INTO public.simulation_log (action, details)
+    VALUES ('SIMULATION_COMPLETE', v_details);
+
+END;
+$$;
+
+-- ================================================================
+-- ÉTAPE 8 : Fonction simple de ping (lecture rapide)
+-- Appelée plus fréquemment pour les vérifications légères
+-- ================================================================
+CREATE OR REPLACE FUNCTION public.ping_base()
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    -- Lectures simples pour marquer l'activité
+    PERFORM COUNT(*) FROM public.profils;
+    PERFORM COUNT(*) FROM public.entreprises;
+    PERFORM COUNT(*) FROM public.produits;
+    PERFORM NOW();
+
+    INSERT INTO public.simulation_log (action, details)
+    VALUES ('PING', 'Ping de maintien actif : ' || to_char(NOW(), 'DD/MM/YYYY HH24:MI:SS'));
+
+    -- Nettoyer les vieux pings (garder 30 jours max)
+    DELETE FROM public.simulation_log
+    WHERE action = 'PING'
+    AND cree_le < NOW() - INTERVAL '30 days';
+END;
+$$;
+
+-- ================================================================
+-- ÉTAPE 9 : Créer les jobs pg_cron
+-- ================================================================
+
+-- Supprimer les anciens jobs s'ils existent
+SELECT cron.unschedule('simulation-activite-entreprise') WHERE EXISTS (
+    SELECT 1 FROM cron.job WHERE jobname = 'simulation-activite-entreprise'
+);
+SELECT cron.unschedule('ping-base-quotidien') WHERE EXISTS (
+    SELECT 1 FROM cron.job WHERE jobname = 'ping-base-quotidien'
+);
+SELECT cron.unschedule('ping-base-frequent') WHERE EXISTS (
+    SELECT 1 FROM cron.job WHERE jobname = 'ping-base-frequent'
+);
+
+-- JOB 1 : Simulation complète toutes les 3 jours à 8h du matin (UTC)
+-- Cron : minute=0, heure=8, jour=*/3
+SELECT cron.schedule(
+    'simulation-activite-entreprise',
+    '0 8 */3 * *',
+    $$SELECT public.simuler_activite_entreprise()$$
+);
+
+-- JOB 2 : Ping quotidien à 14h (UTC) — léger, juste des SELECTs
+SELECT cron.schedule(
+    'ping-base-quotidien',
+    '0 14 * * *',
+    $$SELECT public.ping_base()$$
+);
+
+-- JOB 3 : Ping fréquent toutes les 12 heures (filet de sécurité)
+SELECT cron.schedule(
+    'ping-base-frequent',
+    '0 */12 * * *',
+    $$SELECT 1 FROM public.profils LIMIT 1$$
+);
+
+-- ================================================================
+-- ÉTAPE 10 : Exécuter la première simulation immédiatement
+-- (pour initialiser l'entreprise, les catégories, les produits)
+-- ================================================================
+SELECT public.simuler_activite_entreprise();
+
+-- ================================================================
+-- ÉTAPE 11 : Vérifier que tout est bien en place
+-- ================================================================
+
+-- Vérifier les jobs cron créés
+SELECT jobid, jobname, schedule, command
+FROM cron.job
+ORDER BY jobid;
+
